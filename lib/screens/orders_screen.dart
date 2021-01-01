@@ -15,8 +15,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
   /// int orderType;
   ///1 for dine-in
-  ///2 for takeaway
-  ///3 for delivery
+  ///2 for takeaway  ///3 for delivery
 
 
   @override

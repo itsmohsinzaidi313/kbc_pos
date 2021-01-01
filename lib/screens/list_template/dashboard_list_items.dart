@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kbc_pos/models/generic/dashboard_item_model.dart';
+import 'package:kbc_pos/shared/config.dart';
 
 class DashboardListItem extends StatelessWidget {
   final DashboardItemModel dashboardItem;
   final VoidCallback onTap;
-  final double height, width;
 
-  DashboardListItem({ @required this.dashboardItem, @required this.height,
-    @required this.width, @required this.onTap});
+  DashboardListItem({ @required this.dashboardItem, @required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height,
-      width: width,
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
@@ -29,8 +26,8 @@ class DashboardListItem extends StatelessWidget {
                 Image(
                   image: AssetImage(dashboardItem.img),
                   fit: BoxFit.contain,
-                  width: 80,
-                  height: 80,
+                  width: Config.getDeviceWidth(context) * 0.12,
+                  height: Config.getDeviceHeight(context) * 0.12,
                 ),
                 SizedBox(
                   height: 20,
@@ -39,7 +36,7 @@ class DashboardListItem extends StatelessWidget {
                   dashboardItem.name,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 25,
+                    fontSize: Config.getDeviceWidth(context) * 0.02,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Ubuntu',
                     letterSpacing: 2.0,
@@ -54,7 +51,7 @@ class DashboardListItem extends StatelessWidget {
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: Config.getDeviceWidth(context) * 0.01,
                       fontWeight: FontWeight.normal,
                       letterSpacing: 2.0,
                       color: Colors.grey,

@@ -11,17 +11,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController email = TextEditingController();
-  TextEditingController password = TextEditingController();
-  TextEditingController deviceKey = TextEditingController();
 
   final _usernameFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
-
-  bool _autoValidate = false;
   bool _obscureText = true;
-  bool isLoading = false;
-  bool isOnlineDataLoaded = false;
 
   Icon _icon = Icon(Icons.visibility_off);
   String errorEmail = '',
@@ -73,18 +66,10 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.pushReplacementNamed(context, '/dashboardScreen');
           }
           if (state.status.isSubmissionInProgress) {
-            Scaffold.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                const SnackBar(content: Text('Submitting...')),
-              );
+            _mySnackBar(context: context, msg: 'Submitting...');
           }
           if (state is LoginError) {
-            Scaffold.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(content: Text('ERROR: ${state.error}')),
-              );
+            _mySnackBar(context: context, msg: 'ERROR: ${state.error}');
           }
         },
         child: SingleChildScrollView(

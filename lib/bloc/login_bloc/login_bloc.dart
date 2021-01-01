@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
-import 'package:kbc_pos/data_provider/login_repo/login_svc.dart';
+import 'package:kbc_pos/data_provider/login_repo/login_service.dart';
 import 'package:kbc_pos/models/generic/response_detail.dart';
 import 'package:kbc_pos/models/model_login/username_password.dart';
 
