@@ -66,6 +66,7 @@ class Config {
     String currentTime = formatDateTime.format(dateTime);
     return currentTime;
   }
+
 }
 
 enum DATABASE { STABLE, CREATE, UPGRADE, DOWNGRADE }

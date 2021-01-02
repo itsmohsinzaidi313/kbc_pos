@@ -4,16 +4,14 @@ class Member{
 
   int memberId;
   String memberNo, memberType, memberStatus, memberName;
-  DateTime memberElectDate, memberBirthDate;
+  String memberElectDate, memberBirthDate;
 
   Member(
       {@required this.memberId,
       @required this.memberNo,
       @required this.memberType,
       @required this.memberStatus,
-      @required this.memberName,
-      @required this.memberElectDate,
-      @required this.memberBirthDate});
+      @required this.memberName, this.memberElectDate, this.memberBirthDate});
 
   @override
 

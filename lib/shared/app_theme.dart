@@ -224,4 +224,9 @@ class AppTheme {
   static void showToast(String msg, BuildContext context){
     Toast.show(msg, context, backgroundColor: Colors.redAccent, textColor: Colors.white, duration: 2);
   }
+
+  static void mySnackBar({BuildContext context, String msg}) {
+    final snackBar = SnackBar(content: Text(msg));
+    Scaffold.of(context).showSnackBar(snackBar);
+  }
 }

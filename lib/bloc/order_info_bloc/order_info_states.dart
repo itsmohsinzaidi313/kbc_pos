@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:formz/formz.dart';
 import 'package:kbc_pos/models/objects/location.dart';
 import 'package:kbc_pos/models/objects/member.dart';
@@ -6,8 +7,8 @@ import 'package:kbc_pos/models/objects/session.dart';
 
 class MyOrderInfoStates extends Equatable {
   final List<Member> membersList;
-  final List<Location> locationList;
-  final List<Session> sessionList;
+  final List<DropdownMenuItem<Location>> locationList;
+  final List<DropdownMenuItem<Session>> sessionList;
   final String error;
   final String hintText;
   final bool withSpouse;
@@ -16,6 +17,8 @@ class MyOrderInfoStates extends Equatable {
   final String byName;
   final String radioGroupValue;
   final FormzStatus status;
+  final Location selectedLocation;
+  final Session selectedSession;
 
   MyOrderInfoStates(
       {this.membersList = const [],
@@ -28,12 +31,14 @@ class MyOrderInfoStates extends Equatable {
       this.byCode = 'By Code',
       this.byName = 'By Name',
       this.radioGroupValue = 'By Code',
+        this.selectedLocation =   const Location(),
+        this.selectedSession = const Session(),
       this.status = FormzStatus.pure});
 
   MyOrderInfoStates copyWith(
       {List<Member> membersList,
-      List<Location> venueList,
-      List<Session> sessionList,
+      List<DropdownMenuItem<Location>> venueList,
+      List<DropdownMenuItem<Session>> sessionList,
       String error,
       String hintText,
       bool withSpouse,
@@ -41,6 +46,8 @@ class MyOrderInfoStates extends Equatable {
       String byCode,
       String byName,
       String radioGroupValue,
+      Location selectedLocation,
+      Session selectedSession,
       FormzStatus status}) {
     return MyOrderInfoStates(
         membersList: membersList ?? this.membersList,
@@ -53,6 +60,8 @@ class MyOrderInfoStates extends Equatable {
         byCode: byCode ?? this.byCode,
         byName: byName ?? this.byName,
         radioGroupValue: radioGroupValue ?? this.radioGroupValue,
+        selectedLocation: selectedLocation ?? this.selectedLocation,
+        selectedSession: selectedSession ?? this.selectedSession,
         withSpouse: withSpouse ?? this.withSpouse);
   }
 
@@ -68,6 +77,8 @@ class MyOrderInfoStates extends Equatable {
         byCode,
         byName,
         radioGroupValue,
+        selectedLocation,
+        selectedSession,
         withSpouse
       ];
 }

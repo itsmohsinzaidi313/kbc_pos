@@ -1,8 +1,8 @@
 class Session {
-  int sessionId, sessionApplyDiscount;
-  String sessionName;
+  final int sessionId, sessionApplyDiscount;
+  final String sessionName;
 
-  Session({this.sessionId, this.sessionApplyDiscount, this.sessionName});
+  const Session({this.sessionId, this.sessionApplyDiscount, this.sessionName});
 
   @override
   String toString() {

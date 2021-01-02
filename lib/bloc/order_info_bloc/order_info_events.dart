@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:kbc_pos/models/objects/location.dart';
 import 'package:kbc_pos/models/objects/member.dart';
+import 'package:kbc_pos/models/objects/session.dart';
 
 abstract class OrderInfoEvent extends Equatable{
 
@@ -22,6 +24,18 @@ class SelectedMember extends OrderInfoEvent{
 
   final Member member;
   SelectedMember({ @required this.member});
+}
+
+class SelectedLocation extends OrderInfoEvent{
+
+  final Location location;
+  SelectedLocation({ this.location});
+}
+
+class SelectedSession extends OrderInfoEvent{
+
+  final Session session;
+  SelectedSession({ this.session});
 }
 
 class SearchByCodeChanged extends OrderInfoEvent{

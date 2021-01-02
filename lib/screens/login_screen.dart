@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kbc_pos/bloc/login_bloc/login_bloc.dart';
+import 'package:kbc_pos/shared/app_theme.dart';
 import 'package:kbc_pos/shared/config.dart';
 import 'package:formz/formz.dart';
 
@@ -66,10 +67,10 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.pushReplacementNamed(context, '/dashboardScreen');
           }
           if (state.status.isSubmissionInProgress) {
-            _mySnackBar(context: context, msg: 'Submitting...');
+            AppTheme.mySnackBar(context: context, msg: 'Submitting...');
           }
           if (state is LoginError) {
-            _mySnackBar(context: context, msg: 'ERROR: ${state.error}');
+            AppTheme.mySnackBar(context: context, msg: 'ERROR: ${state.error}');
           }
         },
         child: SingleChildScrollView(
@@ -179,10 +180,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _mySnackBar({BuildContext context, String msg}) {
-    final snackBar = SnackBar(content: Text(msg));
-    Scaffold.of(context).showSnackBar(snackBar);
-  }
 }
 
 class UsernameInput extends StatelessWidget {
