@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 
 class Member{
 
-  int memberId;
-  String memberNo, memberType, memberStatus, memberName;
-  String memberElectDate, memberBirthDate;
+  final int memberId;
+  final String memberNo, memberType, memberStatus, memberName;
+  final String memberElectDate, memberBirthDate;
 
-  Member(
-      {@required this.memberId,
-      @required this.memberNo,
-      @required this.memberType,
-      @required this.memberStatus,
-      @required this.memberName, this.memberElectDate, this.memberBirthDate});
+  const Member(
+      { this.memberId,
+       this.memberNo,
+       this.memberType,
+       this.memberStatus, this.memberName, this.memberElectDate, this.memberBirthDate});
 
   @override
 

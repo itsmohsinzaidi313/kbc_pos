@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:kbc_pos/models/objects/location.dart';
 import 'package:kbc_pos/models/objects/member.dart';
 import 'package:kbc_pos/models/objects/session.dart';
@@ -12,13 +12,7 @@ abstract class OrderInfoEvent extends Equatable{
   List<Object> get props => [];
 }
 
-class FetchingLists extends OrderInfoEvent{
-
-}
-
-class InsertOrderInfo extends OrderInfoEvent{
-
-}
+class FetchingLists extends OrderInfoEvent{}
 
 class SelectedMember extends OrderInfoEvent{
 
@@ -38,23 +32,6 @@ class SelectedSession extends OrderInfoEvent{
   SelectedSession({ this.session});
 }
 
-class SearchByCodeChanged extends OrderInfoEvent{
-
-  final String byCode;
-  SearchByCodeChanged({ this.byCode});
-
-  @override
-  List<Object> get props => [byCode];
-}
-
-class SearchByNameChanged extends OrderInfoEvent{
-
-  final String byName;
-  SearchByNameChanged({ this.byName});
-
-  @override
-  List<Object> get props => [byName];
-}
 
 class AtPartyChanged extends OrderInfoEvent{
 
@@ -74,6 +51,21 @@ class WithSpouseChanged extends OrderInfoEvent{
   List<Object> get props => [withSpouse];
 }
 
-class OrderSubmitted extends OrderInfoEvent{
+class WaiterChanged extends OrderInfoEvent{
 
+  final String waiter;
+  const WaiterChanged({ this.waiter});
 }
+
+class TableNoChanged extends OrderInfoEvent{
+
+  final String tableNo;
+  const TableNoChanged({ this.tableNo});
+}
+
+class WaiterUnfocused extends OrderInfoEvent{}
+
+class TableNoUnfocused extends OrderInfoEvent{}
+
+class OrderSubmitted extends OrderInfoEvent{}
+

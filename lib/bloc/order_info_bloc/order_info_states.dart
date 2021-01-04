@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:formz/formz.dart';
+import 'package:kbc_pos/models/model_order_info/table_no.dart';
+import 'package:kbc_pos/models/model_order_info/waiter.dart';
 import 'package:kbc_pos/models/objects/location.dart';
 import 'package:kbc_pos/models/objects/member.dart';
 import 'package:kbc_pos/models/objects/session.dart';
@@ -10,30 +12,29 @@ class MyOrderInfoStates extends Equatable {
   final List<DropdownMenuItem<Location>> locationList;
   final List<DropdownMenuItem<Session>> sessionList;
   final String error;
-  final String hintText;
   final bool withSpouse;
   final bool atParty;
-  final String byCode;
-  final String byName;
-  final String radioGroupValue;
-  final FormzStatus status;
   final Location selectedLocation;
   final Session selectedSession;
+  final FormzStatus status;
+  final Waiter waiter;
+  final TableNo tableNo;
+  final Member selectedMember;
 
   MyOrderInfoStates(
       {this.membersList = const [],
       this.locationList = const [],
       this.sessionList = const [],
       this.error = '',
-      this.hintText = 'Search By Code',
       this.withSpouse = false,
       this.atParty = false,
-      this.byCode = 'By Code',
-      this.byName = 'By Name',
-      this.radioGroupValue = 'By Code',
-        this.selectedLocation =   const Location(),
-        this.selectedSession = const Session(),
-      this.status = FormzStatus.pure});
+      this.selectedLocation = const Location(),
+      this.selectedSession = const Session(),
+      this.status = FormzStatus.pure,
+      this.waiter = const Waiter.pure(),
+      this.tableNo = const TableNo.pure(),
+      this.selectedMember = const Member()
+      });
 
   MyOrderInfoStates copyWith(
       {List<Member> membersList,
@@ -48,21 +49,24 @@ class MyOrderInfoStates extends Equatable {
       String radioGroupValue,
       Location selectedLocation,
       Session selectedSession,
+      Waiter waiter,
+      TableNo tableNo,
+      Member selectedMember,
       FormzStatus status}) {
     return MyOrderInfoStates(
         membersList: membersList ?? this.membersList,
         locationList: venueList ?? this.locationList,
         sessionList: sessionList ?? this.sessionList,
         error: error ?? this.error,
-        hintText: hintText ?? this.hintText,
         status: status ?? this.status,
         atParty: atParty ?? this.atParty,
-        byCode: byCode ?? this.byCode,
-        byName: byName ?? this.byName,
-        radioGroupValue: radioGroupValue ?? this.radioGroupValue,
         selectedLocation: selectedLocation ?? this.selectedLocation,
         selectedSession: selectedSession ?? this.selectedSession,
-        withSpouse: withSpouse ?? this.withSpouse);
+        withSpouse: withSpouse ?? this.withSpouse,
+        waiter: waiter ?? this.waiter,
+        tableNo: tableNo ?? this.tableNo,
+        selectedMember: selectedMember ?? this.selectedMember
+    );
   }
 
   @override
@@ -71,24 +75,15 @@ class MyOrderInfoStates extends Equatable {
         locationList,
         sessionList,
         error,
-        hintText,
         status,
         atParty,
-        byCode,
-        byName,
-        radioGroupValue,
         selectedLocation,
         selectedSession,
-        withSpouse
+        withSpouse,
+        waiter,
+        tableNo,
+        selectedMember
       ];
 }
 
 class FetchingListInProgress extends MyOrderInfoStates {}
-
-class FetchingListSuccessful extends MyOrderInfoStates {}
-
-class FetchingListFailed extends MyOrderInfoStates {
-  final String error;
-
-  FetchingListFailed({this.error});
-}

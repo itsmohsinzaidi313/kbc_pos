@@ -1,0 +1,87 @@
+import 'package:flutter/material.dart';
+import 'package:kbc_pos/shared/app_theme.dart';
+import 'package:kbc_pos/shared/config.dart';
+
+class CustomAppBar extends StatelessWidget {
+  final Widget searchBar;
+  final Widget radioButtons;
+  final String appBarTitle;
+  final Function onBackPressed;
+
+  CustomAppBar(
+      {@required this.searchBar,
+      @required this.radioButtons,
+      @required this.appBarTitle,
+      @required this.onBackPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: Config.getDeviceHeight(context) * 0.25,
+      child: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            height: Config.getDeviceHeight(context) * 0.15,
+            color: AppTheme.appBarColor,
+            child: Center(
+              child: Text(
+                appBarTitle,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 10,
+            left: 10,
+            child: Container(
+              width: 100,
+              height: 100,
+              color: Colors.green,
+            ),
+          ),
+          Positioned(
+            top: 40,
+            left: 0,
+            right: 0,
+            child: Container(
+              margin: EdgeInsets.all(16),
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(5.0),
+                border: Border.all(
+                  color: Colors.grey[200],
+                  width: 2,
+                  style: BorderStyle.solid,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(5, 10, 5, 5),
+                      height: 50,
+                      child: searchBar,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: radioButtons,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

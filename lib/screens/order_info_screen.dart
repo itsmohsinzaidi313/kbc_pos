@@ -1,4 +1,5 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +12,8 @@ import 'package:kbc_pos/models/objects/member.dart';
 import 'package:kbc_pos/models/objects/session.dart';
 import 'package:kbc_pos/shared/app_theme.dart';
 import 'package:kbc_pos/shared/config.dart';
+import 'package:formz/formz.dart';
+import 'custom_widget_classes/custom_appbar.dart';
 
 class OrderInfoScreen extends StatefulWidget {
   @override
@@ -18,10 +21,11 @@ class OrderInfoScreen extends StatefulWidget {
 }
 
 class _OrderInfoScreenState extends State<OrderInfoScreen> {
-
   String radioGroupValue = 'By Code';
   final TextEditingController _autoCompleteController = TextEditingController();
   GlobalKey<AutoCompleteTextFieldState<Member>> _key = GlobalKey();
+  final _waiterFocusNode = FocusNode();
+  final _tableNoFocusNode = FocusNode();
 
   Future<List<Member>> getMembers() async {
     List<Member> list;
@@ -54,6 +58,17 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   void initState() {
     super.initState();
     context.read<OrderInfoBloc>().add(FetchingLists());
+    _waiterFocusNode.addListener(() {
+      if (!_waiterFocusNode.hasFocus) {
+        context.read<OrderInfoBloc>().add(WaiterUnfocused());
+        FocusScope.of(context).requestFocus(_tableNoFocusNode);
+      }
+    });
+    _tableNoFocusNode.addListener(() {
+      if (!_tableNoFocusNode.hasFocus) {
+        context.read<OrderInfoBloc>().add(TableNoUnfocused());
+      }
+    });
   }
 
   @override
@@ -64,121 +79,146 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
         listener: (context, state) {
           if (state is FetchingListInProgress) {
             AppTheme.mySnackBar(context: context, msg: 'Loading..');
+          } else if (state.status.isSubmissionFailure) {
+            AppTheme.mySnackBar(context: context, msg: state.error);
+          } else if (state.status.isSubmissionInProgress) {
+            CircularProgressIndicator();
+            // AppTheme.mySnackBar(context: context, msg: 'Please Wait..');
+          } else if (state.status.isSubmissionSuccess) {
+            AppTheme.mySnackBar(
+                context: context, msg: 'Order Submitted Successfully..');
           }
         },
         child: Container(
           width: Config.getDeviceWidth(context),
           height: Config.getDeviceHeight(context),
-          child: Column(
-            children: [
-              customAppBar(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CustomLabelledTextView(
-                    labelName: 'Member Name',
-                    text: 'Dr. Sahab',
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                CustomAppBar(
+                  appBarTitle: 'Order Information',
+                  searchBar: autoCompleteSearchBar(),
+                  radioButtons: searchRadioButton(),
+                ),
+                BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+                  builder: (context, state) {
+                    return Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomLabelledTextView(
+                              labelName: 'Member Name',
+                              text: state.selectedMember.memberName ?? '...',
+                            ),
+                            CustomLabelledTextView(
+                              labelName: 'Member Code',
+                              text: state.selectedMember.memberNo ?? '...',
+                            ),
+                            CustomLabelledTextView(
+                              labelName: 'Member Status',
+                              text: state.selectedMember.memberStatus ?? '...',
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomLabelledTextView(
+                              labelName: 'Order No.',
+                              text: '...',
+                            ),
+                            CustomLabelledTextView(
+                              labelName: 'Covers',
+                              text: '...',
+                            ),
+                            CustomLabelledTextView(
+                              labelName: 'Slip',
+                              text: '...',
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    LocationDropdown(),
+                    SessionDropdown(),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    WaiterInput(
+                      focusNode: _waiterFocusNode,
+                    ),
+                    TableInput(
+                      focusNode: _tableNoFocusNode,
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    AtPartyCheckBox(),
+                    WithSpouseCheckBox(),
+                  ],
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(
+                    vertical: 20.0,
                   ),
-                  CustomLabelledTextView(
-                    labelName: 'Member Code',
-                    text: '01234',
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      submitButton(),
+                    ],
                   ),
-                  CustomLabelledTextView(
-                    labelName: 'Member Status',
-                    text: 'A',
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CustomLabelledTextView(
-                    labelName: 'Order No.',
-                    text: '12345',
-                  ),
-                  CustomLabelledTextView(
-                    labelName: 'Covers',
-                    text: 'Covers',
-                  ),
-                  CustomLabelledTextView(
-                    labelName: 'Slip',
-                    text: 'Slip',
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [LocationDropdown(), SessionDropdown()],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget customAppBar(){
-    return Container(
-      width: double.infinity,
-      height: Config.getDeviceHeight(context) * 0.25,
-      child: Stack(
-        children: [
-          Container(
-            width: double.infinity,
-            height: Config.getDeviceHeight(context) * 0.15,
-            color: AppTheme.appBarColor,
-            child: Center(
-              child: Text(
-                'Order Information',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 40,
-            left: 0,
-            right: 0,
-            child: Container(
-              margin: EdgeInsets.all(16),
-              padding: EdgeInsets.all(8),
-              decoration: BoxDecoration(
+  Widget submitButton() {
+    return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+      builder: (context, state) {
+        return SizedBox(
+          width: Config.getDeviceWidth(context) * 0.4,
+          height: Config.getDeviceHeight(context) * 0.08,
+          child: RaisedButton.icon(
+            onPressed: state.status.isValidated
+                ? () {
+                    context.read<OrderInfoBloc>().add(OrderSubmitted());
+                  }
+                : null,
+            color: AppTheme.listTextColor,
+            label: Text(
+              'SUBMIT',
+              style: GoogleFonts.ubuntuCondensed(
                 color: Colors.white,
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(5.0),
-                border: Border.all(
-                  color: Colors.grey[200],
-                  width: 2,
-                  style: BorderStyle.solid,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      padding: EdgeInsets.fromLTRB(5, 10, 5, 5),
-                      height: 50,
-                      child: autoCompleteSearchBar(),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: searchRadioButton(),
-                  ),
-                ],
+                letterSpacing: 1.0,
+                fontSize: 20,
               ),
             ),
+            icon: Icon(
+              Icons.check,
+              color: Colors.green,
+              size: 20,
+            ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget searchRadioButton(){
+  Widget searchRadioButton() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -187,7 +227,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
             Radio(
               value: 'By Code',
               groupValue: radioGroupValue,
-              onChanged: (value){
+              onChanged: (value) {
                 setState(() {
                   radioGroupValue = value;
                 });
@@ -208,7 +248,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
             Radio(
               value: 'By Name',
               groupValue: radioGroupValue,
-              onChanged: (value){
+              onChanged: (value) {
                 setState(() {
                   radioGroupValue = value;
                 });
@@ -238,11 +278,9 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
               child: Text('Progressing..'),
             ),
           );
-        }
-        else if(snapshot.hasError){
+        } else if (snapshot.hasError) {
           print(snapshot.error);
-        }
-        else if(snapshot.hasData){
+        } else if (snapshot.hasData) {
           return AutoCompleteTextField<Member>(
             clearOnSubmit: false,
             style: TextStyle(
@@ -269,7 +307,9 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
               print(value);
             },
             itemSubmitted: (item) async {
-              _autoCompleteController.text = radioGroupValue == 'By Code' ? item.memberNo : item.memberName;
+              _autoCompleteController.text = radioGroupValue == 'By Code'
+                  ? item.memberNo
+                  : item.memberName;
               context.read<OrderInfoBloc>().add(SelectedMember(member: item));
             },
             key: _key,
@@ -285,7 +325,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
             },
             itemFilter: (item, query) {
               bool _itemFilter;
-              if(_autoCompleteController.text.isNotEmpty) {
+              if (_autoCompleteController.text.isNotEmpty) {
                 _itemFilter = radioGroupValue == 'By Code'
                     ? item.memberNo
                         .toLowerCase()
@@ -293,7 +333,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                     : item.memberName
                         .toLowerCase()
                         .startsWith(query.toLowerCase());
-              } else{
+              } else {
                 _autoCompleteController.text = '';
                 _itemFilter = false;
               }
@@ -322,7 +362,6 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
     );
   }
 }
-
 
 class CustomLabelledTextView extends StatelessWidget {
   final String labelName, text;
@@ -459,11 +498,9 @@ class SessionDropdown extends StatelessWidget {
 }
 
 class WaiterInput extends StatelessWidget {
-  const WaiterInput({Key key, this.focusNode, this.obscureText})
-      : super(key: key);
+  const WaiterInput({Key key, this.focusNode}) : super(key: key);
 
   final FocusNode focusNode;
-  final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
@@ -471,24 +508,28 @@ class WaiterInput extends StatelessWidget {
       builder: (context, state) {
         return Flexible(
           flex: 1,
-          child: TextFormField(
-            // initialValue: state.password.value,
-            focusNode: focusNode,
-            decoration: InputDecoration(
-              icon: const Icon(Icons.person),
-              labelText: 'Waiter',
-              // helperText: 'Please enter valid password',
-              helperMaxLines: 2,
-              errorMaxLines: 2,
-              // errorText: state.password.invalid
-              //     ? 'Please ensure the password entered is valid'
-              //     : null,
+          child: Container(
+            padding: EdgeInsets.all(3.0),
+            margin: EdgeInsets.all(5.0),
+            child: TextFormField(
+              // initialValue: state.password.value,
+              focusNode: focusNode,
+              decoration: InputDecoration(
+                icon: const Icon(Icons.person),
+                labelText: 'Waiter',
+                helperText: 'Please enter valid waiter',
+                helperMaxLines: 2,
+                errorMaxLines: 2,
+                errorText: state.waiter.invalid
+                    ? 'Please ensure the waiter entered is valid'
+                    : null,
+              ),
+              keyboardType: TextInputType.text,
+              onChanged: (value) {
+                context.read<OrderInfoBloc>().add(WaiterChanged(waiter: value));
+              },
+              textInputAction: TextInputAction.done,
             ),
-            keyboardType: TextInputType.text,
-            obscureText: obscureText,
-            onChanged: (value) {
-            },
-            textInputAction: TextInputAction.done,
           ),
         );
       },
@@ -497,11 +538,9 @@ class WaiterInput extends StatelessWidget {
 }
 
 class TableInput extends StatelessWidget {
-  const TableInput({Key key, this.focusNode, this.obscureText})
-      : super(key: key);
+  const TableInput({Key key, this.focusNode}) : super(key: key);
 
   final FocusNode focusNode;
-  final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
@@ -509,24 +548,30 @@ class TableInput extends StatelessWidget {
       builder: (context, state) {
         return Flexible(
           flex: 1,
-          child: TextFormField(
-            // initialValue: state.password.value,
-            focusNode: focusNode,
-            decoration: InputDecoration(
-              icon: const Icon(Icons.wine_bar),
-              labelText: 'Table',
-              // helperText: 'Please enter valid password',
-              helperMaxLines: 2,
-              errorMaxLines: 2,
-              // errorText: state.password.invalid
-              //     ? 'Please ensure the password entered is valid'
-              //     : null,
+          child: Container(
+            padding: EdgeInsets.all(3.0),
+            margin: EdgeInsets.all(5.0),
+            child: TextFormField(
+              // initialValue: state.password.value,
+              focusNode: focusNode,
+              decoration: InputDecoration(
+                icon: const Icon(Icons.wine_bar),
+                labelText: 'Table',
+                helperText: 'Please enter valid table no',
+                helperMaxLines: 2,
+                errorMaxLines: 2,
+                errorText: state.tableNo.invalid
+                    ? 'Please ensure the table no entered is valid'
+                    : null,
+              ),
+              keyboardType: TextInputType.text,
+              onChanged: (value) {
+                context
+                    .read<OrderInfoBloc>()
+                    .add(TableNoChanged(tableNo: value));
+              },
+              textInputAction: TextInputAction.done,
             ),
-            keyboardType: TextInputType.text,
-            obscureText: obscureText,
-            onChanged: (value) {
-            },
-            textInputAction: TextInputAction.done,
           ),
         );
       },
@@ -534,3 +579,66 @@ class TableInput extends StatelessWidget {
   }
 }
 
+class AtPartyCheckBox extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+      builder: (context, state) {
+        return Row(
+          children: [
+            Checkbox(
+              value: state.atParty,
+              onChanged: (value) {
+                print('At Party CheckBox Value: $value');
+                context
+                    .read<OrderInfoBloc>()
+                    .add(AtPartyChanged(atParty: value));
+              },
+            ),
+            Text(
+              'Party',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.0,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class WithSpouseCheckBox extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+      builder: (context, state) {
+        return Row(
+          children: [
+            Checkbox(
+              value: state.withSpouse,
+              onChanged: (value) {
+                print('With Spouse CheckBox Value: $value');
+                context
+                    .read<OrderInfoBloc>()
+                    .add(WithSpouseChanged(withSpouse: value));
+              },
+            ),
+            Text(
+              'With Spouse',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.0,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}

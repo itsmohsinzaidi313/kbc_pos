@@ -1,239 +1,251 @@
-import 'package:draggable_floating_button/draggable_floating_button.dart';
+import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kbc_pos/bloc/order_info_bloc/order_info_bloc.dart';
+import 'package:kbc_pos/bloc/order_info_bloc/order_info_events.dart';
+import 'package:kbc_pos/models/objects/member.dart';
 import 'package:kbc_pos/shared/app_theme.dart';
 import 'package:kbc_pos/shared/config.dart';
 
-class NewSale extends StatefulWidget {
+import 'custom_widget_classes/custom_appbar.dart';
+
+class PosScreen extends StatefulWidget {
   @override
-  _NewSaleState createState() => _NewSaleState();
+  _PosScreenState createState() => _PosScreenState();
 }
 
-class _NewSaleState extends State<NewSale> {
+class _PosScreenState extends State<PosScreen> {
   GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
+  GlobalKey<AutoCompleteTextFieldState<Member>> _tKey =
+      GlobalKey<AutoCompleteTextFieldState<Member>>();
+
+  String radioGroupValue = 'By Code';
+  final TextEditingController _autoCompleteController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    var _appBar = AppTheme.appBarNormal(
-      context: context,
-      appBarTitle: 'New Sales',
-      appBarElevation: 0.0,
-      appBarBgColor: AppTheme.appBarColor,
-    );
-    return WillPopScope(
-        child: Scaffold(
-          key: _key,
-          backgroundColor: Colors.grey[200],
-          appBar: _appBar,
-          body: Stack(
-            children: [
-              Container(
-                child: Column(
-                  children: [
-                    Container(
-                      color: Colors.red,
-                      child: Row(
-                        children: [
-                          Flexible(
-                            flex: 1,
-                            child: ListTile(
-                              leading: Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: 'model.leadingString'.isNotEmpty
-                                      ? Colors.yellow.shade600
-                                      : Colors.red,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  'model.leadingString',
-                                  style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              title: Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: 'model.titleString'.isNotEmpty
-                                      ? Colors.yellow.shade600
-                                      : Colors.red,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Center(
-                                  child: Text('model.titleString',
-                                      style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontWeight: FontWeight.bold)),
-                                ),
-                              ),
-                              trailing: Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: ' model.trailingString'.isNotEmpty
-                                      ? Colors.yellow.shade600
-                                      : Colors.red,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text('model.trailingString',
-                                    style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontWeight: FontWeight.bold)),
-                              ),
-                            ),
+    return Scaffold(
+      key: _key,
+      body: Column(
+        children: [
+          CustomAppBar(
+            appBarTitle: 'POS Screen',
+            searchBar: autoCompleteSearchBar(),
+            radioButtons: searchRadioButton(),
+          ),
+          Flexible(
+            flex: 1,
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            color: Colors.yellow,
                           ),
-                        ],
-                      ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Container(
+                            color: Colors.red,
+                          ),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Flexible(
-                            flex: 2,
-                            child: Column(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                                  child: Text(
-                                    'Categories'.toUpperCase(),
-                                    style: GoogleFonts.staatliches(
-                                      color: Colors.grey[500],
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 5.0,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  height:
-                                      Config.getDeviceHeight(context) * 0.12,
-                                  padding: EdgeInsets.only(top: 5),
-                                  // decoration: BoxDecoration(border: Border.all(width: 2)),
-                                  child: ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: getCategoryWidgets(
-                                        /*model.lstCategory*/ null),
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                                  child: Text(
-                                    'Items'.toUpperCase(),
-                                    style: GoogleFonts.staatliches(
-                                      color: Colors.grey[500],
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 5.0,
-                                    ),
-                                  ),
-                                ),
-                                Flexible(
-                                  flex: 2,
-                                  child: Container(
-                                    padding: EdgeInsets.only(top: 5),
-                                    // decoration: BoxDecoration(border: Border.all(width: 2)),
-                                    child: GridView.count(
-                                      crossAxisCount: 4,
-                                      children: getItemsWidgets(
-                                          /*model.lstItem*/ null,
-                                          'categoryName'),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              height: Config.getDeviceHeight(context),
-                              margin: EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(5),
-                                shape: BoxShape.rectangle,
-                                border: Border(
-                                  left: BorderSide(
-                                    color: Colors.grey[300],
-                                    width: 2,
-                                  ),
-                                  right: BorderSide(
-                                    color: Colors.grey[300],
-                                    width: 2,
-                                  ),
-                                  bottom: BorderSide(
-                                    color: Colors.grey[300],
-                                    width: 2,
-                                  ),
-                                  top: BorderSide(
-                                    color: Colors.grey[300],
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                              child: /* model.order.itemList.length*/ 1 > 0
-                                  ? ListView(
-                                      children: getCartItemsWidgets(List.from(
-                                          /*model.order.itemList.reversed*/ null)),
-                                    )
-                                  : Container(
-                                      alignment: Alignment.bottomCenter,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          fit: BoxFit.cover,
-                                          // scale: 10,
-                                          image: AssetImage(
-                                            'assets/empty_cart.png',
-                                          ),
-                                        ),
-                                      ),
-
-                                    ),
-                            ),
-                          ),
-                        ],
-                      ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      color: Colors.green,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              DraggableFloatingActionButton(
-                backgroundColor: Colors.red,
-                elevation: 5,
-                tooltip: 'Submit Order',
-                appContext: context,
-                appBar: _appBar,
-                offset: new Offset(
-                  Config.getDeviceWidth(context) * 0.91,
-                  Config.getDeviceHeight(context) * 0.72,
-                ),
-                child: Icon(
-                  Icons.done_rounded,
-                  size: 35,
-                  color: Colors.red.shade100,
-                ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget searchRadioButton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Column(
+          children: [
+            Radio(
+              value: 'By Code',
+              groupValue: radioGroupValue,
+              onChanged: (value) {
+                setState(() {
+                  radioGroupValue = value;
+                });
+              },
+            ),
+            Text(
+              'By Code',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            Radio(
+              value: 'By Name',
+              groupValue: radioGroupValue,
+              onChanged: (value) {
+                setState(() {
+                  radioGroupValue = value;
+                });
+              },
+            ),
+            Text(
+              'By Name',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget autoCompleteSearchBar() {
+    return FutureBuilder(
+      builder: (context, snapshot) {
+        if (snapshot.hasData == null &&
+            snapshot.connectionState == ConnectionState.none) {
+          return Container(
+            child: Center(
+              child: Text('Progressing..'),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          print(snapshot.error);
+        } else if (snapshot.hasData) {
+          return AutoCompleteTextField<Member>(
+            clearOnSubmit: false,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+            ),
+            decoration: InputDecoration(
+              hintText: 'Search Item Here..',
+              border: InputBorder.none,
+              suffixIcon: IconButton(
+                icon: Icon(Icons.cancel),
+                iconSize: 20,
+                color: Colors.yellow[700],
                 onPressed: () {
-                  /*model.order.itemList.length*/ 1 > 0
-                      ? AppTheme.showAlertDialogOK(
-                          context,
-                          title: 'Success',
-                          message: 'Order saved.',
-                          onOK: () => _onFloatingButtonPressed(),
-                        )
-                      : AppTheme.showAlertDialogOK(
-                          context,
-                          title: 'Failed',
-                          message: 'Please add Items to punch order',
-                          onOK: () => Navigator.pop(context),
-                        );
+                  _autoCompleteController.text = "";
                 },
               ),
-            ],
-          ),
-        ),
-        onWillPop: _onWillPop);
+              contentPadding: EdgeInsets.fromLTRB(10, 30, 10, 20),
+              hintStyle: TextStyle(color: Colors.grey),
+            ),
+            keyboardType: TextInputType.text,
+            controller: _autoCompleteController,
+            textChanged: (value) {
+              print(value);
+            },
+            itemSubmitted: (item) async {
+              _autoCompleteController.text = radioGroupValue == 'By Code'
+                  ? item.memberNo
+                  : item.memberName;
+              BlocProvider.of<OrderInfoBloc>(context)
+                  .add(SelectedMember(member: item));
+            },
+            key: _tKey,
+            suggestions: snapshot.data,
+            itemBuilder: (context, item) {
+              return radioGroupValue == 'By Code'
+                  ? autoCompleteSearchBarRow(
+                      item: item.memberNo, icon: Icon(Icons.person))
+                  : autoCompleteSearchBarRow(
+                      item: item.memberName, icon: Icon(Icons.person));
+              // return autoCompleteSearchBarRow(
+              //     item: item.memberNo, icon: Icon(Icons.person));
+            },
+            itemFilter: (item, query) {
+              bool _itemFilter;
+              if (_autoCompleteController.text.isNotEmpty) {
+                _itemFilter = radioGroupValue == 'By Code'
+                    ? item.memberNo
+                        .toLowerCase()
+                        .startsWith(query.toLowerCase())
+                    : item.memberName
+                        .toLowerCase()
+                        .startsWith(query.toLowerCase());
+              } else {
+                _autoCompleteController.text = '';
+                _itemFilter = false;
+              }
+              return _itemFilter;
+              // return item.memberNo.toLowerCase().startsWith(query.toLowerCase());
+            },
+            itemSorter: (a, b) {
+              return radioGroupValue == 'By Code'
+                  ? a.memberNo.compareTo(b.memberNo.toLowerCase())
+                  : a.memberName.compareTo(b.memberName.toLowerCase());
+              // return a.memberNo.compareTo(b.memberNo.toLowerCase());
+            },
+          );
+        }
+        return Container();
+      },
+      future: getMembers(),
+    );
+  }
+
+  Future<List<Member>> getMembers() async {
+    List<Member> list;
+    await Future.delayed(Duration(seconds: 1), () {
+      list = [
+        Member(
+            memberId: 1,
+            memberNo: '1220',
+            memberType: 'PL',
+            memberStatus: 'E',
+            memberName: 'MR. C. G. KHARAS'),
+        Member(
+            memberId: 1,
+            memberNo: '1856',
+            memberType: 'PO',
+            memberStatus: 'R',
+            memberName: 'MR. USMAN AMINUDDIN'),
+        Member(
+            memberId: 1,
+            memberNo: '2651',
+            memberType: 'PE',
+            memberStatus: 'E',
+            memberName: 'MR. SALEENM A. THARIANI'),
+      ];
+    });
+    return list;
+  }
+
+  Widget autoCompleteSearchBarRow(
+      {@required String item, @required Icon icon}) {
+    return ListTile(
+      leading: icon,
+      title: Text(item),
+    );
   }
 
   Future<bool> _onWillPop() async {
@@ -525,7 +537,5 @@ class _NewSaleState extends State<NewSale> {
     return widgets;*/
   }
 
-  void _onFloatingButtonPressed() async {
-  }
-
+  void _onFloatingButtonPressed() async {}
 }

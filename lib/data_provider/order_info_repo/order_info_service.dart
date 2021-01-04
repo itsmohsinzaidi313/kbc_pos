@@ -53,9 +53,12 @@ class OrderInfoService extends OrderInfoRepo{
   }
 
   @override
-  Future<bool> insertOrderInfo() {
-    // TODO: implement insertOrderInfo
-    throw UnimplementedError();
+  Future<bool> insertOrderInfo() async{
+    bool isInserted = false;
+    await Future.delayed(Duration(seconds: 1), (){
+      isInserted = true;
+    });
+    return isInserted;
   }
 }
 

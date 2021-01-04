@@ -8,9 +8,9 @@ import 'package:kbc_pos/data_provider/order_info_repo/order_info_service.dart';
 import 'package:kbc_pos/screens/dashboard_screen.dart';
 import 'package:kbc_pos/screens/login_screen.dart';
 import 'package:kbc_pos/screens/order_info_screen.dart';
+import 'package:kbc_pos/screens/pos_screen.dart';
 import 'package:kbc_pos/screens/settings_screen.dart';
 import 'package:kbc_pos/screens/splash_screen.dart';
-
 import 'bloc/login_bloc/login_bloc.dart';
 import 'data_provider/login_repo/login_service.dart';
 
@@ -33,12 +33,13 @@ void main() {
       ],
       child: new MaterialApp(
         title: 'POS',
-        initialRoute: '/orderInfoScreen',
+        initialRoute: '/posScreen',
         routes: {
           '/splashScreen': (context) => SplashScreen(),
           '/loginScreen': (context) => LoginScreen(),
           '/dashboardScreen': (context) => DashboardScreen(),
           '/orderInfoScreen': (context) => OrderInfoScreen(),
+          '/posScreen': (context) => PosScreen(),
           '/settingScreen': (context) => SettingsScreen(),
         },
         theme: ThemeData(
