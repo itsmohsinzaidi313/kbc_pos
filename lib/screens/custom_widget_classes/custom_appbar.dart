@@ -37,12 +37,15 @@ class CustomAppBar extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 10,
-            left: 10,
-            child: Container(
-              width: 100,
-              height: 100,
-              color: Colors.green,
+            top: 20,
+            left: 0,
+            child: IconButton(
+              icon: Icon(
+                Icons.arrow_back_outlined,
+                color: Colors.white,
+                size: 20,
+              ),
+              onPressed: onBackPressed,
             ),
           ),
           Positioned(

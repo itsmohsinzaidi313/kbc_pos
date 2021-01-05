@@ -1,12 +1,17 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
-import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_bloc.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_events.dart';
+import 'package:kbc_pos/bloc/pos_bloc/pos_bloc.dart';
+import 'package:kbc_pos/bloc/pos_bloc/pos_events.dart';
+import 'package:kbc_pos/bloc/pos_bloc/pos_states.dart';
+import 'package:kbc_pos/models/objects/category.dart';
 import 'package:kbc_pos/models/objects/member.dart';
+import 'package:kbc_pos/screens/custom_widget_classes/custom_circular_progress_indicator.dart';
 import 'package:kbc_pos/shared/app_theme.dart';
 import 'package:kbc_pos/shared/config.dart';
 
@@ -26,53 +31,93 @@ class _PosScreenState extends State<PosScreen> {
   final TextEditingController _autoCompleteController = TextEditingController();
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    context.read<PosBloc>().add(FetchAllLists());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       key: _key,
-      body: Column(
-        children: [
-          CustomAppBar(
-            appBarTitle: 'POS Screen',
-            searchBar: autoCompleteSearchBar(),
-            radioButtons: searchRadioButton(),
-          ),
-          Flexible(
-            flex: 1,
-            child: Container(
-              margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Column(
+      body: BlocListener<PosBloc, MyPosStates>(
+        listenWhen: (pre, curr) => pre.states != curr.states,
+        listener: (context, states) {
+          if (states.states == PosStates.successful) {
+            AppTheme.mySnackBar(
+                context: context, msg: 'List Fetched Successfully..');
+          } else if (states.states == PosStates.failed) {
+            AppTheme.mySnackBar(context: context, msg: states.error);
+            print(states.error);
+          }
+          /*else if (states.states == PosStates.inProgress) {
+            AppTheme.mySnackBar(context: context, msg: 'Loading...');
+          }*/
+        },
+        child: SingleChildScrollView(
+          child: Container(
+            height: Config.getDeviceHeight(context),
+            width: Config.getDeviceWidth(context),
+            child: Column(
+              children: [
+                CustomAppBar(
+                  appBarTitle: 'POS Screen',
+                  searchBar: autoCompleteSearchBar(),
+                  radioButtons: searchRadioButton(),
+                  onBackPressed: () => Navigator.pop(context),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: Container(
+                    margin:
+                        EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
+                    child: Row(
                       children: [
                         Expanded(
-                          flex: 1,
-                          child: Container(
-                            color: Colors.yellow,
+                          flex: 2,
+                          child: Column(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  child: Column(
+                                    children: [
+                                      Text('Categories'),
+                                      CategoryList(),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 4,
+                                child: Column(
+                                  children: [
+                                    Text('Items'),
+                                    ItemList(),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         Expanded(
-                          flex: 2,
+                          flex: 1,
                           child: Container(
-                            color: Colors.red,
+                            color: Colors.green,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      color: Colors.green,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
+      floatingActionButton: _floatingActionButton(),
     );
   }
 
@@ -272,29 +317,30 @@ class _PosScreenState extends State<PosScreen> {
     }
   }
 
-  List<Widget> getCategoryWidgets(List<dynamic> lstCategory) {
-    /*List<Widget> widgets = [];
+  List<Widget> getCategoryWidgets(List<Category> lstCategory) {
+    List<Widget> widgets = [];
     lstCategory.forEach((category) {
-      if(_element.isEmpty){
-        setState(() {
-          _element = category.categoryName;
-        });
-      }
+      // if(_element.isEmpty){
+      //   setState(() {
+      //     _element = category.categoryName;
+      //   });
+      // }
       widgets.add(
         Card(
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(40),
           ),
-          color: _element == category.categoryName ? Colors.white70 : Colors.white,
+          color: /*_element == category.categoryName ? Colors.white70 : */ Colors
+              .white,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: InkWell(
               onTap: () {
-                setState(() {
+/*                setState(() {
                   categoryName = category.categoryName;
                   _element = category.categoryName;
-                });
+                });*/
               },
               child: Row(
                 children: [
@@ -315,7 +361,7 @@ class _PosScreenState extends State<PosScreen> {
                     width: Config.getDeviceHeight(context) * 0.18,
                     child: Center(
                       child: Text(
-                        category.categoryName.toUpperCase(),
+                        category.name.toUpperCase(),
                         textAlign: TextAlign.center,
                         style: GoogleFonts.ubuntuCondensed(
                           color: Colors.red.shade700,
@@ -334,12 +380,11 @@ class _PosScreenState extends State<PosScreen> {
         ),
       );
     });
-    return widgets;*/
-    return [];
+    return widgets;
   }
 
   List<Widget> getItemsWidgets(List<dynamic> lstItem, String categoryName) {
-    /*List<Widget> widgets = [];
+/*    List<Widget> widgets = [];
     lstItem.forEach((item) {
       // if (categoryName.isEmpty) {
       //   categoryName = item.categoryName;
@@ -537,5 +582,243 @@ class _PosScreenState extends State<PosScreen> {
     return widgets;*/
   }
 
-  void _onFloatingButtonPressed() async {}
+  Widget _floatingActionButton({Function onPressed}) {
+    return FloatingActionButton(
+      onPressed: onPressed,
+      backgroundColor: AppTheme.appBarColor,
+      tooltip: 'Order Submission',
+      child: Icon(
+        Icons.add,
+        color: Colors.white,
+      ),
+    );
+  }
+}
+
+class ItemList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PosBloc, MyPosStates>(
+      builder: (context, states) {
+        if (states.states == PosStates.itemListLoaded ||
+            states.states == PosStates.successful) {
+          return Flexible(
+            flex: 1,
+            child: GridView.builder(
+                itemCount: states.itemsList.length,
+                shrinkWrap: true,
+                scrollDirection: Axis.vertical,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4),
+                physics: ClampingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: 3,
+                    color: Colors.white,
+                    child: InkWell(
+                      onTap: () {
+                        // setState(() {
+                        //   this.model.order.addItem(item);
+                        // });
+                      },
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            child: Container(
+                              height: Config.getDeviceHeight(context) * 0.2,
+                              width: Config.getDeviceWidth(context) * 0.159,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10),
+                                ),
+                                image: DecorationImage(
+                                  image: AssetImage('assets/no_image1.jpg'),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'No Image'.toUpperCase(),
+                              style: GoogleFonts.anton(
+                                color: Colors.white70,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            child: Container(
+                              padding: EdgeInsets.all(8),
+                              height: Config.getDeviceHeight(context) * 0.094,
+                              width: Config.getDeviceWidth(context) * 0.158,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(10),
+                                  bottomRight: Radius.circular(10),
+                                ),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Expanded(
+                                        flex: 2,
+                                        child: Text(
+                                          states.itemsList[index].name
+                                              .toUpperCase(),
+                                          textAlign: TextAlign.left,
+                                          style: GoogleFonts.ubuntuCondensed(
+                                            color: Colors.grey.shade800,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0,
+                                            wordSpacing: 0.5,
+                                          ),
+                                        ),
+                                      ),
+                                      Column(
+                                        // mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            'PKR ${double.parse(states.itemsList[index].price).toInt().toString()}',
+                                            style: GoogleFonts.ubuntuCondensed(
+                                              color: Colors.grey.shade500,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              wordSpacing: 1.0,
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.star,
+                                                size: 10,
+                                                color: Colors.yellow.shade900,
+                                              ),
+                                              Icon(
+                                                Icons.star,
+                                                size: 10,
+                                                color: Colors.yellow.shade900,
+                                              ),
+                                              Icon(
+                                                Icons.star_half_outlined,
+                                                size: 10,
+                                                color: Colors.yellow.shade900,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+          );
+        }
+        return CustomCircularProgressIndication();
+      },
+    );
+  }
+}
+
+class CategoryList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PosBloc, MyPosStates>(
+      builder: (context, states) {
+        if (states.states == PosStates.categoryListLoaded ||
+            states.states == PosStates.successful) {
+          return Flexible(
+            flex: 1,
+            child: ListView.builder(
+                itemCount: states.categoriesList.length,
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                physics: ClampingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    color: states.selectedCategory.name == states.categoriesList[index].name ?
+                    Colors.white70 :  Colors
+                        .white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: InkWell(
+                        onTap: () {
+                          print(
+                              'Category Item Pressed: ${states.categoriesList[index]}');
+                          /*                setState(() {
+                        categoryName = category.categoryName;
+                        _element = category.categoryName;
+                      });*/
+                        },
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 16,
+                              backgroundColor: Colors.yellow.shade700,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 13,
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.grey.shade700,
+                                  radius: 9,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: Config.getDeviceHeight(context) * 0.1,
+                              width: Config.getDeviceHeight(context) * 0.18,
+                              child: Center(
+                                child: Text(
+                                  states.categoriesList[index].name
+                                      .toUpperCase(),
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.ubuntuCondensed(
+                                    color: Colors.red.shade700,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1.2,
+                                    wordSpacing: 1.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+          );
+        }
+        return CustomCircularProgressIndication();
+      },
+    );
+  }
 }

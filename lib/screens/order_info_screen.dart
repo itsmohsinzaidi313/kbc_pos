@@ -99,6 +99,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                   appBarTitle: 'Order Information',
                   searchBar: autoCompleteSearchBar(),
                   radioButtons: searchRadioButton(),
+                  onBackPressed: () => Navigator.pop(context),
                 ),
                 BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
                   builder: (context, state) {
