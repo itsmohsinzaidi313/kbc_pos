@@ -10,6 +10,7 @@ import 'package:kbc_pos/bloc/pos_bloc/pos_bloc.dart';
 import 'package:kbc_pos/bloc/pos_bloc/pos_events.dart';
 import 'package:kbc_pos/bloc/pos_bloc/pos_states.dart';
 import 'package:kbc_pos/models/objects/category.dart';
+import 'package:kbc_pos/models/objects/item.dart';
 import 'package:kbc_pos/models/objects/member.dart';
 import 'package:kbc_pos/screens/custom_widget_classes/custom_circular_progress_indicator.dart';
 import 'package:kbc_pos/shared/app_theme.dart';
@@ -102,12 +103,7 @@ class _PosScreenState extends State<PosScreen> {
                             ],
                           ),
                         ),
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            color: Colors.green,
-                          ),
-                        ),
+                        CartItemList(),
                       ],
                     ),
                   ),
@@ -118,6 +114,7 @@ class _PosScreenState extends State<PosScreen> {
         ),
       ),
       floatingActionButton: _floatingActionButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
     );
   }
 
@@ -522,8 +519,9 @@ class _PosScreenState extends State<PosScreen> {
     return [];
   }
 
+/*
   List<Widget> getCartItemsWidgets(List<dynamic> lstItem) {
-    /*List<Widget> widgets = [];
+    List<Widget> widgets = [];
     lstItem.forEach((item) {
       widgets.add(
         GestureDetector(
@@ -579,8 +577,9 @@ class _PosScreenState extends State<PosScreen> {
         ),
       );
     });
-    return widgets;*/
+    return widgets;
   }
+*/
 
   Widget _floatingActionButton({Function onPressed}) {
     return FloatingActionButton(
@@ -596,12 +595,15 @@ class _PosScreenState extends State<PosScreen> {
 }
 
 class ItemList extends StatelessWidget {
+  static List<Item> _cartList = [];
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PosBloc, MyPosStates>(
       builder: (context, states) {
         if (states.states == PosStates.itemListLoaded ||
-            states.states == PosStates.successful) {
+            states.states == PosStates.successful ||
+            states.states == PosStates.init) {
           return Flexible(
             flex: 1,
             child: GridView.builder(
@@ -620,9 +622,10 @@ class ItemList extends StatelessWidget {
                     color: Colors.white,
                     child: InkWell(
                       onTap: () {
-                        // setState(() {
-                        //   this.model.order.addItem(item);
-                        // });
+                        _cartList.add(states.itemsList[index]);
+                        context
+                            .read<PosBloc>()
+                            .add(AddCartItem(item: states.itemsList[index]));
                       },
                       child: Stack(
                         children: [
@@ -749,7 +752,8 @@ class CategoryList extends StatelessWidget {
     return BlocBuilder<PosBloc, MyPosStates>(
       builder: (context, states) {
         if (states.states == PosStates.categoryListLoaded ||
-            states.states == PosStates.successful) {
+            states.states == PosStates.successful ||
+            states.states == PosStates.init) {
           return Flexible(
             flex: 1,
             child: ListView.builder(
@@ -763,13 +767,16 @@ class CategoryList extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40),
                     ),
-                    color: states.selectedCategory.name == states.categoriesList[index].name ?
-                    Colors.white70 :  Colors
-                        .white,
+                    color: states.selectedCategory.name ==
+                            states.categoriesList[index].name
+                        ? Colors.white70
+                        : Colors.white,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: InkWell(
                         onTap: () {
+                          context.read<PosBloc>().add(CategoryChanged(
+                              category: states.categoriesList[index]));
                           print(
                               'Category Item Pressed: ${states.categoriesList[index]}');
                           /*                setState(() {
@@ -820,5 +827,118 @@ class CategoryList extends StatelessWidget {
         return CustomCircularProgressIndication();
       },
     );
+  }
+}
+
+class CartItemList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PosBloc, MyPosStates>(
+        buildWhen: (pre, curr) => curr.cartItemsList.length > 0,
+        builder: (context, state) {
+          return Flexible(
+            flex: 1,
+            child: ListView.builder(
+              itemCount: state.cartItemsList.length + 1,
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              reverse: true,
+              physics: ClampingScrollPhysics(),
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return ListTile(
+                    title: Text('You can add here..'),
+                  );
+                }
+                return Card(
+                  elevation: 4,
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.yellow.shade700,
+                      radius: 16,
+                      child: CircleAvatar(
+                        radius: 14,
+                        backgroundImage: AssetImage('assets/no_image1.jpg'),
+                      ),
+                    ),
+                    title: Text(
+                      state.cartItemsList[index - 1].name.toUpperCase(),
+                      style: GoogleFonts.ubuntuCondensed(
+                        color: Colors.black87,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.8,
+                        wordSpacing: 0.5,
+                      ),
+                    ),
+                    subtitle: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 8,),
+                        Text(
+                          ' ${double.parse(state.cartItemsList[index - 1].price).toInt().toString()} x ${state.cartItemsList[index - 1].quantity} '
+                          '= ${(double.parse(state.cartItemsList[index - 1].price).toInt() * state.cartItemsList[index - 1].quantity).toString()}',
+                          style: TextStyle(
+                            color: Colors.grey.shade800,
+                            fontSize: 12,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.remove,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                context
+                                    .read<PosBloc>()
+                                    .add(MinusCartItem(index: index - 1));
+                              },
+                            ),
+                            Text(
+                              state.cartItemsList[index - 1].quantity
+                                  .toString(),
+                              style: TextStyle(
+                                color: Colors.grey.shade900,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.add,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                context
+                                    .read<PosBloc>()
+                                    .add(PlusCartItem(index: index - 1));
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    isThreeLine: true,
+                    trailing: IconButton(
+                      icon: Icon(
+                        Icons.delete_forever,
+                        color: Colors.yellow.shade800,
+                        size: 22,
+                      ),
+                      onPressed: () {
+                        context
+                            .read<PosBloc>()
+                            .add(RemoveCartItem(index: index - 1));
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        });
   }
 }

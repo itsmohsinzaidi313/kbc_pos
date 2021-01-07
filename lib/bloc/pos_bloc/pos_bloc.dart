@@ -9,6 +9,7 @@ import 'package:kbc_pos/models/objects/item.dart';
 class PosBloc extends Bloc<PosEvent, MyPosStates>{
 
   final PosRepo posRepo;
+  List<Item> _cartList = [];
   PosBloc({ @required this.posRepo}) : super(MyPosStates());
 
   @override
@@ -23,6 +24,34 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
       } catch(e){
         yield state.copyWith(error: e.toString(), states: PosStates.failed);
       }
+    } else if (event is CategoryChanged){
+      try {
+        yield state.copyWith(categoriesList: state.categoriesList, selectedCategory: event.category, states: PosStates.categoryListLoaded);
+        List<Item> item = await posRepo.getItemsById(id: event.category.id);
+        yield state.copyWith(itemsList: item, states: PosStates.successful);
+      } catch (e) {
+        yield state.copyWith(error: e.toString(), states: PosStates.failed);
+      }
+    } else if (event is AddCartItem){
+      if(!_cartList.contains(event.item)){
+        _cartList.add(event.item);
+        yield state.copyWith(cartItemsList:_cartList);
+      }
+    } else if (event is PlusCartItem){
+      Item x = _cartList.elementAt(event.index);
+      x.quantity = x.quantity +1;
+      yield state.copyWith(cartItemsList: _cartList);
+    } else if (event is MinusCartItem){
+      Item x = _cartList.elementAt(event.index);
+      if(x.quantity > 1){
+        x.quantity = x.quantity -1;
+        yield state.copyWith(cartItemsList: _cartList);
+      }
+    } else if (event is RemoveCartItem){
+      // Item x = _cartList.elementAt(event.index);
+      // x.quantity = x.quantity -1;
+      _cartList.removeAt(event.index);
+      yield state.copyWith(cartItemsList: _cartList);
     }
   }
 

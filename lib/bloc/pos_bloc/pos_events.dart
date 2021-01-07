@@ -1,4 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:kbc_pos/models/objects/category.dart';
+import 'package:kbc_pos/models/objects/item.dart';
 
 abstract class PosEvent extends Equatable{
 
@@ -20,20 +22,31 @@ class FetchItemListById extends PosEvent{
 }
 
 class AddCartItem extends PosEvent{
-  final dynamic item;
+  final Item item;
   AddCartItem({ this.item });
 }
 
-class ModifyCartItem extends PosEvent{
+class PlusCartItem extends PosEvent{
 
-  final int index, plusItem, minusItem;
-  ModifyCartItem({this.index, this.plusItem, this.minusItem});
+  final int index;
+  PlusCartItem({this.index});
+}
+
+class MinusCartItem extends PosEvent{
+
+  final int index;
+  MinusCartItem({this.index});
 }
 
 class RemoveCartItem extends PosEvent{
 
   final int index;
   RemoveCartItem({this.index});
+}
+
+class CategoryChanged extends PosEvent{
+  final Category category;
+  CategoryChanged({this.category});
 }
 
 class PosOrderSubmitted extends PosEvent{}
