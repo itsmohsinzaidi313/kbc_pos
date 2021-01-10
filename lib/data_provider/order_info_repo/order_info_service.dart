@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:kbc_pos/models/objects/location.dart';
 import 'package:kbc_pos/models/objects/member.dart';
 import 'package:kbc_pos/models/objects/session.dart';
+import 'package:http/http.dart' as http;
+import 'package:kbc_pos/shared/config.dart';
 
 abstract class OrderInfoRepo{
 
-  Future<List<Member>> getMembers();
+  Future<List<Member>> getMembers(String query);
   Future<List<Location>> getLocation();
   Future<List<Session>> getSession();
   Future<bool> insertOrderInfo();
@@ -13,15 +17,20 @@ abstract class OrderInfoRepo{
 class OrderInfoService extends OrderInfoRepo{
 
   @override
-  Future<List<Member>> getMembers() async{
-    List<Member> list;
-    await Future.delayed(Duration(seconds: 1), (){
-      list = [
-        Member(memberId: 1, memberNo: '1220', memberType: 'PL', memberStatus: 'E', memberName: 'MR. C. G. KHARAS'),
-        Member(memberId: 1, memberNo: '1856', memberType: 'PO', memberStatus: 'R', memberName: 'MR. USMAN AMINUDDIN'),
-        Member(memberId: 1, memberNo: '2651', memberType: 'PE', memberStatus: 'E', memberName: 'MR. SALEENM A. THARIANI'),
-      ];
-    });
+  Future<List<Member>> getMembers(String query) async{
+      List<Member> list;
+    try {
+      String url = '${Config.getMembersAPI}$query';
+      final response = await http.get(url);
+      print(response.body);
+      if(response.statusCode == 200){
+            list = memberListFromJson(jsonDecode(response.body));
+          }else{
+            throw Exception(response.reasonPhrase);
+          }
+    } catch (e) {
+      print(e);
+    }
     return list;
   }
 
