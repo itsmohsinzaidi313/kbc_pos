@@ -3,9 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:kbc_pos/shared/app_theme.dart';
 import 'package:kbc_pos/shared/config.dart';
 
-
 class OrderScreen extends StatefulWidget {
-
   @override
   _OrderScreenState createState() => _OrderScreenState();
 }
@@ -16,7 +14,6 @@ class _OrderScreenState extends State<OrderScreen> {
   /// int orderType;
   ///1 for dine-in
   ///2 for takeaway  ///3 for delivery
-
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +28,7 @@ class _OrderScreenState extends State<OrderScreen> {
       body: Container(
         height: Config.getDeviceHeight(context),
         width: Config.getDeviceWidth(context),
+
         child: Column(
           children: [
             Row(
@@ -43,7 +41,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     padding: const EdgeInsets.all(3.0),
                     child: RaisedButton.icon(
                       onPressed: () {
-                          ///set orderType to 1
+                        ///set orderType to 1
                       },
                       color: AppTheme.listTextColor,
                       icon: Icon(
@@ -59,7 +57,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     padding: const EdgeInsets.all(3.0),
                     child: RaisedButton.icon(
                       onPressed: () {
-                          ///set orderType to 2
+                        ///set orderType to 2
                       },
                       color: AppTheme.listTextColor,
                       icon: Icon(
@@ -75,7 +73,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     padding: const EdgeInsets.all(3.0),
                     child: RaisedButton.icon(
                       onPressed: () {
-                          ///set orderType to 3
+                        ///set orderType to 3
                       },
                       color: AppTheme.listTextColor,
                       icon: Icon(
@@ -88,15 +86,16 @@ class _OrderScreenState extends State<OrderScreen> {
               ],
             ),
             Expanded(
-                flex: 1,
-                child: FutureBuilder(
-                    future: getOrdersList(/*orderType*/null),
-                    initialData: Container(
-                      child: SpinKitRing(
-                        color: Colors.yellow[800],
-                      ),
+              flex: 1,
+              child: FutureBuilder(
+                  future: getOrdersList(/*orderType*/ null),
+                  initialData: Container(
+                    child: SpinKitRing(
+                      color: Colors.yellow[800],
                     ),
-                    builder: (context, snapshot) => snapshot.data)),
+                  ),
+                  builder: (context, snapshot) => snapshot.data),
+            ),
           ],
         ),
       ),
@@ -107,13 +106,16 @@ class _OrderScreenState extends State<OrderScreen> {
     Widget widget;
     switch (orderType) {
       case 1:
-      ///get dine-in list
+
+        ///get dine-in list
         break;
       case 2:
-      ///get takeaway list
+
+        ///get takeaway list
         break;
       case 3:
-      ///get delivery list
+
+        ///get delivery list
         break;
       default:
         break;

@@ -75,7 +75,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
       final tableNo = TableNo.dirty(state.tableNo.value);
       yield state.copyWith(waiter: waiter,  tableNo: tableNo, status: Formz.validate([waiter, tableNo]));
 
-      if (state.status.isValidated) {
+      if (state.status.isValidated && state.selectedMember.memberName.isNotEmpty) {
         try {
           yield state.copyWith(status: FormzStatus.submissionInProgress);
           await Future<void>.delayed(Duration(seconds: 1,), () async{

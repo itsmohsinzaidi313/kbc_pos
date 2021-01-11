@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kbc_pos/bloc/pos_bloc/pos_events.dart';
 import 'package:kbc_pos/models/generic/dashboard_item_model.dart';
+import 'package:kbc_pos/shared/app_theme.dart';
 import 'package:kbc_pos/shared/config.dart';
 
 class DashboardListItem extends StatelessWidget {
@@ -11,6 +13,8 @@ class DashboardListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: Config.getDeviceHeight(context) / 5,
+      width: Config.getDeviceWidth(context) / 5,
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),

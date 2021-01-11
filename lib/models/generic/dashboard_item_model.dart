@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class DashboardItemModel {
 
   String img, name, subtitle;
@@ -15,7 +17,7 @@ class DashboardItemModel {
           img: 'assets/order.png',
           name: 'Pending Orders',
           subtitle: 'Your pending orders'),
-      DashboardItemModel(
+/*      DashboardItemModel(
           img: 'assets/report.png',
           name: 'Reports',
           subtitle: 'Your daily reports'),
@@ -26,14 +28,22 @@ class DashboardItemModel {
       DashboardItemModel(
           img: 'assets/register.png',
           name: 'Close Register',
-          subtitle: 'Close your register'),
+          subtitle: 'Close your register'),*/
       DashboardItemModel(
           img: 'assets/logout.png', name: 'Logout', subtitle: 'You can rest'),
-      DashboardItemModel(
+/*      DashboardItemModel(
           img: 'assets/database-storage.png',
           name: 'Database',
-          subtitle: 'Provides raw database access')
+          subtitle: 'Provides raw database access')*/
     ];
     return _dashboardItemModel;
+  }
+
+  static navigationFromDashboard(int index, BuildContext context){
+    switch(index){
+      case 0:
+        Navigator.pushNamed(context, '/orderInfoScreen');
+        break;
+    }
   }
 }

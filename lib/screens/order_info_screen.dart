@@ -162,9 +162,9 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                   ],
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    AtPartyCheckBox(),
+                    // AtPartyCheckBox(),
                     WithSpouseCheckBox(),
                   ],
                 ),
@@ -194,7 +194,8 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
           width: Config.getDeviceWidth(context) * 0.4,
           height: Config.getDeviceHeight(context) * 0.08,
           child: RaisedButton.icon(
-            onPressed: state.status.isValidated
+            onPressed: (state.status.isValidated &&
+                    state.selectedMember.memberName != null)
                 ? () {
                     context.read<OrderInfoBloc>().add(OrderSubmitted());
                   }
@@ -425,32 +426,51 @@ class LocationDropdown extends StatelessWidget {
       builder: (context, state) {
         return Flexible(
           flex: 1,
-          child: Container(
-            padding: EdgeInsets.all(3.0),
-            margin: EdgeInsets.all(5.0),
-            height: Config.getDeviceHeight(context) * 0.1,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(5.0),
-            ),
-            child: DropdownButton<Location>(
-              icon: Icon(Icons.arrow_drop_down_circle),
-              iconSize: 24,
-              elevation: 16,
-              value: state.selectedLocation,
-              isExpanded: true,
-              style: TextStyle(
-                color: Colors.grey[700],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 5.0,
+                  top: 3.0,
+                ),
+                child: Text(
+                  'Select Venue: ',
+                  style: GoogleFonts.ubuntuCondensed(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[700],
+                    letterSpacing: 1.0,
+                  ),
+                ),
               ),
-              onChanged: (newValue) {
-                context
-                    .read<OrderInfoBloc>()
-                    .add(SelectedLocation(location: newValue));
-              },
-              items: state.locationList,
-            ),
+              Container(
+                padding: EdgeInsets.all(3.0),
+                margin: EdgeInsets.all(5.0),
+                height: Config.getDeviceHeight(context) * 0.1,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                child: DropdownButton<Location>(
+                  icon: Icon(Icons.arrow_drop_down_circle),
+                  iconSize: 24,
+                  elevation: 16,
+                  value: state.selectedLocation,
+                  isExpanded: true,
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                  ),
+                  onChanged: (newValue) {
+                    context.read<OrderInfoBloc>()
+                        .add(SelectedLocation(location: newValue));
+                  },
+                  items: state.locationList,
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -465,32 +485,52 @@ class SessionDropdown extends StatelessWidget {
       builder: (context, state) {
         return Flexible(
           flex: 1,
-          child: Container(
-            padding: EdgeInsets.all(3.0),
-            margin: EdgeInsets.all(5.0),
-            height: Config.getDeviceHeight(context) * 0.1,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(5.0),
-            ),
-            child: DropdownButton<Session>(
-              icon: Icon(Icons.arrow_drop_down_circle),
-              iconSize: 24,
-              elevation: 16,
-              value: state.selectedSession,
-              isExpanded: true,
-              style: TextStyle(
-                color: Colors.grey[700],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 5.0,
+                  top: 3.0,
+                ),
+                child: Text(
+                  'Select Session: ',
+                  style: GoogleFonts.ubuntuCondensed(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[700],
+                    letterSpacing: 1.0,
+                  ),
+                ),
               ),
-              onChanged: (newValue) {
-                context
-                    .read<OrderInfoBloc>()
-                    .add(SelectedSession(session: newValue));
-              },
-              items: state.sessionList,
-            ),
+              Container(
+                padding: EdgeInsets.all(3.0),
+                margin: EdgeInsets.all(5.0),
+                height: Config.getDeviceHeight(context) * 0.1,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                child: DropdownButton<Session>(
+                  icon: Icon(Icons.arrow_drop_down_circle),
+                  iconSize: 24,
+                  elevation: 16,
+                  value: state.selectedSession,
+                  isExpanded: true,
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                  ),
+                  onChanged: (newValue) {
+                    context
+                        .read<OrderInfoBloc>()
+                        .add(SelectedSession(session: newValue));
+                  },
+                  items: state.sessionList,
+                ),
+              ),
+            ],
           ),
         );
       },

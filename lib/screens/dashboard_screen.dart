@@ -18,10 +18,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         backgroundColor: Colors.red,
         elevation: 0.0,
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('Dashboard'),
-            Text('Shift#: '),
+            // Text('Shift#: '),
           ],
         ),
         centerTitle: true,
@@ -34,15 +34,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           itemCount: DashboardItemModel().dashboardItemModel.length,
           shrinkWrap: true,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              crossAxisSpacing: 2,
-              mainAxisSpacing: 2,
-              childAspectRatio: Config.getDeviceWidth(context) / 1000),
+            crossAxisCount: 4,
+            crossAxisSpacing: 2,
+            mainAxisSpacing: 2,
+            childAspectRatio: Config.getDeviceWidth(context) / 1000,
+          ),
           itemBuilder: (context, position) {
             return DashboardListItem(
               dashboardItem: DashboardItemModel().dashboardItemModel[position],
               onTap: () {
-                print(DashboardItemModel().dashboardItemModel[position].name);
+                DashboardItemModel.navigationFromDashboard(position, context);
               },
             );
           },

@@ -4,11 +4,30 @@ import 'package:logger/logger.dart';
 
 class Config {
 
+  //region ___ALL APIS___
   static final String ipAddress = "192.168.18.250";
   static final String commonAPI = "http://$ipAddress/kbc/data";
   static final String key = "?key=123";
   static final String getCategoryAPI = "$commonAPI/getcategories$key";
   static final String getItemsAPI = "$commonAPI/getitems$key&categoryid=";
+  static String loginUserAPI = "$commonAPI/getuser$key&";
+
+  setLoginUserAPI(String username, String password){
+    loginUserAPI = "${loginUserAPI}username=$username&password=$password";
+  }
+
+  getLoginUserAPI() => loginUserAPI;
+  //endregion
+
+  //region ___USER OBJECT___
+  static int _userId;
+
+  static int get userId => _userId;
+
+  static set userId(int value) {
+    _userId = value;
+  }
+  //endregion
 
   static double getDeviceWidth(BuildContext context) =>
       MediaQuery.of(context).size.width;

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,7 @@ import 'package:kbc_pos/bloc/pos_bloc/pos_bloc.dart';
 import 'package:kbc_pos/data_provider/order_info_repo/order_info_service.dart';
 import 'package:kbc_pos/data_provider/pos_repo/pos_service.dart';
 import 'package:kbc_pos/screens/dashboard_screen.dart';
+import 'package:kbc_pos/screens/list_template/dashboard_list_items.dart';
 import 'package:kbc_pos/screens/login_screen.dart';
 import 'package:kbc_pos/screens/order_info_screen.dart';
 import 'package:kbc_pos/screens/pos_screen.dart';
@@ -43,7 +46,7 @@ void main() {
       ],
       child: new MaterialApp(
         title: 'POS',
-        initialRoute: '/posScreen',
+        initialRoute: '/dashboardScreen',
         routes: {
           '/splashScreen': (context) => SplashScreen(),
           '/loginScreen': (context) => LoginScreen(),

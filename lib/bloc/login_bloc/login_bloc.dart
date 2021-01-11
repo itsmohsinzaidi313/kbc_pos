@@ -5,8 +5,10 @@ import 'package:formz/formz.dart';
 import 'package:kbc_pos/data_provider/login_repo/login_service.dart';
 import 'package:kbc_pos/models/generic/response_detail.dart';
 import 'package:kbc_pos/models/model_login/username_password.dart';
+import 'package:kbc_pos/shared/config.dart';
 
 part 'login_states.dart';
+
 part 'login_events.dart';
 
 class LoginBloc extends Bloc<LoginEvent, MyLoginState> {
@@ -22,32 +24,31 @@ class LoginBloc extends Bloc<LoginEvent, MyLoginState> {
 
   @override
   Stream<MyLoginState> mapEventToState(LoginEvent event) async* {
-
-    if(event is UsernameChanged){
+    if (event is UsernameChanged) {
       final username = Username.dirty(event.username);
       yield state.copyWith(
-          username: username.valid ? username : Username.pure(event.username),
+        username: username.valid ? username : Username.pure(event.username),
         status: Formz.validate([username, state.password]),
       );
-    } else if(event is PasswordChanged){
+    } else if (event is PasswordChanged) {
       final password = Password.dirty(event.password);
       yield state.copyWith(
-        password:  password.valid ? password : Password.pure(event.password),
+        password: password.valid ? password : Password.pure(event.password),
         status: Formz.validate([state.username, password]),
       );
-    } else if(event is UsernameUnfocused){
+    } else if (event is UsernameUnfocused) {
       final username = Username.dirty(state.username.value);
       yield state.copyWith(
         username: username,
         status: Formz.validate([username, state.password]),
       );
-    } else if(event is PasswordUnfocused){
+    } else if (event is PasswordUnfocused) {
       final password = Password.dirty(state.password.value);
       yield state.copyWith(
-        password:  password,
+        password: password,
         status: Formz.validate([state.username, password]),
       );
-    } else if (event is FormSubmitted){
+    } else if (event is FormSubmitted) {
       final username = Username.dirty(state.username.value);
       final password = Password.dirty(state.password.value);
       yield state.copyWith(
@@ -56,13 +57,18 @@ class LoginBloc extends Bloc<LoginEvent, MyLoginState> {
         status: Formz.validate([username, password]),
       );
 
-      if (state.status.isValidated){
+      if (state.status.isValidated) {
         try {
           yield state.copyWith(status: FormzStatus.submissionInProgress);
-          await Future<void>.delayed(const Duration(seconds: 1), () async{
-            await loginRepo.authenticateUser(username: state.username.value, password: state.password.value);
-          });
-          yield state.copyWith(status: FormzStatus.submissionSuccess);
+          final response = await loginRepo.authenticateUser(
+              username: state.username.value, password: state.password.value);
+          if (response.status) {
+            Config.userId = response.userId;
+            yield state.copyWith(status: FormzStatus.submissionSuccess);
+          } else {
+            yield state.copyWith(status: FormzStatus.submissionFailure);
+            yield LoginError(error: response.message);
+          }
         } catch (e) {
           yield state.copyWith(status: FormzStatus.submissionFailure);
           yield LoginError(error: e);
@@ -71,4 +77,3 @@ class LoginBloc extends Bloc<LoginEvent, MyLoginState> {
     }
   }
 }
-
