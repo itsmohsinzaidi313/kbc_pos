@@ -53,6 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordFocusNode.dispose();
   }
 
+  final GlobalKey<FormState> _formKey = GlobalKey();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override

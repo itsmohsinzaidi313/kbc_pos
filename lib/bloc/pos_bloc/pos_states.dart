@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:kbc_pos/models/objects/category.dart';
 import 'package:kbc_pos/models/objects/item.dart';
 

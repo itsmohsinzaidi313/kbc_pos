@@ -6,6 +6,7 @@ class Config {
 
   //region ___ALL APIS___
   static final String ipAddress = "192.168.18.250";
+  static final String ipAddress = "192.168.18.250";
   static final String commonAPI = "http://$ipAddress/kbc/data";
   static final String key = "?key=123";
   static final String getCategoryAPI = "$commonAPI/getcategories$key";
