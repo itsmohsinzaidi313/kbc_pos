@@ -39,6 +39,7 @@ dependencies:
   formz: ^0.3.1
   double_back_to_close_app: ^2.0.1
   autocomplete_textfield: ^1.7.3
+  material_floating_search_bar: ^0.2.6
 
 
 

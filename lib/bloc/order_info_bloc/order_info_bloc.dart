@@ -14,6 +14,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
   final OrderInfoRepo orderInfoRepo;
 
   List<Member> _membersList;
+  List<Member> _selectedMembersList = [];
   List<DropdownMenuItem<Location>> _venueList;
   List<DropdownMenuItem<Session>> _sessionList;
 
@@ -24,66 +25,83 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
     if (event is FetchingLists) {
       try {
         yield FetchingListInProgress();
-        _membersList = await orderInfoRepo.getMembers();
         List<Location> location = await orderInfoRepo.getLocation();
         List<Session> session = await orderInfoRepo.getSession();
         locationMapListToDropdownMenuItemList(list: location);
         sessionMapListToDropdownMenuItemList(list: session);
-        yield state.copyWith(venueList: _venueList, membersList: _membersList,
-            sessionList: _sessionList, selectedLocation: location.first, selectedSession: session.first);
+        yield state.copyWith(
+            venueList: _venueList,
+            membersList: _membersList,
+            sessionList: _sessionList,
+            selectedLocation: location.first,
+            selectedSession: session.first);
       } catch (e) {
-          yield state.copyWith(status: FormzStatus.submissionFailure, error: e.toString());
+        yield state.copyWith(
+            status: FormzStatus.submissionFailure, error: e.toString());
       }
-    }  else if (event is AtPartyChanged) {
+    } else if (event is AtPartyChanged) {
       yield state.copyWith(atParty: event.atParty);
     } else if (event is WithSpouseChanged) {
       yield state.copyWith(withSpouse: event.withSpouse);
-    }
-    else if (event is SelectedLocation){
+    } else if (event is SelectedLocation) {
       yield state.copyWith(selectedLocation: event.location);
-    } else if (event is SelectedSession){
+    } else if (event is SelectedSession) {
       yield state.copyWith(selectedSession: event.session);
-    } else if (event is WaiterUnfocused){
+    } else if (event is WaiterUnfocused) {
       final waiter = Waiter.dirty(state.waiter.value);
       yield state.copyWith(
-        waiter: waiter,
-        status: Formz.validate([waiter, state.tableNo])
-      );
-    } else if (event is TableNoUnfocused){
+          waiter: waiter, status: Formz.validate([waiter, state.tableNo]));
+    } else if (event is TableNoUnfocused) {
       final tableNo = TableNo.dirty(state.tableNo.value);
       yield state.copyWith(
-          tableNo: tableNo,
-          status: Formz.validate([state.waiter, tableNo])
-      );
-    } else if (event is WaiterChanged){
+          tableNo: tableNo, status: Formz.validate([state.waiter, tableNo]));
+    } else if (event is WaiterChanged) {
       final waiter = Waiter.dirty(event.waiter);
       yield state.copyWith(
           waiter: waiter.valid ? waiter : Waiter.pure(event.waiter),
-          status: Formz.validate([waiter, state.tableNo])
-      );
-    } else if (event is TableNoChanged){
+          status: Formz.validate([waiter, state.tableNo]));
+    } else if (event is TableNoChanged) {
       final tableNo = TableNo.dirty(event.tableNo);
       yield state.copyWith(
           tableNo: tableNo.valid ? tableNo : TableNo.pure(event.tableNo),
-          status: Formz.validate([state.waiter, tableNo])
-      );
-    } else if (event is SelectedMember){
-      yield state.copyWith(selectedMember: event.member);
-    } else if (event is OrderSubmitted){
-
+          status: Formz.validate([state.waiter, tableNo]));
+    } else if (event is SelectedMember) {
+      _selectedMembersList.add(event.member);
+      yield state.copyWith(selectedMember: _selectedMembersList);
+    } else if(event is ByCodeChanged){
+      yield state.copyWith(byCode: event.byCode, radioGroupValue: event.byCode);
+    } else if(event is ByNameChanged){
+      yield state.copyWith(byName: event.byName, radioGroupValue: event.byName);
+    } else if(event is SearchTextChanged){
+      try {
+        _membersList = await orderInfoRepo.getMembers(event.text);
+        yield state.copyWith(membersList: _membersList);
+      } catch (e) {
+        yield state.copyWith(error: e.toString());
+        print(e.toString());
+      }
+    } else if (event is OrderSubmitted) {
       final waiter = Waiter.dirty(state.waiter.value);
       final tableNo = TableNo.dirty(state.tableNo.value);
-      yield state.copyWith(waiter: waiter,  tableNo: tableNo, status: Formz.validate([waiter, tableNo]));
+      yield state.copyWith(
+          waiter: waiter,
+          tableNo: tableNo,
+          status: Formz.validate([waiter, tableNo]),
+      );
 
       if (state.status.isValidated && state.selectedMember.memberName.isNotEmpty) {
         try {
           yield state.copyWith(status: FormzStatus.submissionInProgress);
-          await Future<void>.delayed(Duration(seconds: 1,), () async{
+          await Future<void>.delayed(
+              Duration(
+                seconds: 1,
+              ), () async {
             await orderInfoRepo.insertOrderInfo();
           });
           yield state.copyWith(status: FormzStatus.submissionSuccess);
         } catch (e) {
-          yield state.copyWith(status: FormzStatus.submissionFailure, error: e.toString());
+          yield state.copyWith(
+              status: FormzStatus.submissionFailure, error: e.toString());
         }
       }
     }
