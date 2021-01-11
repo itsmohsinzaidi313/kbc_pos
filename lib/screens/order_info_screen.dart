@@ -330,8 +330,8 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
           child: RaisedButton.icon(
             onPressed: state.status.isValidated
                 ? () {
-                    context.read<OrderInfoBloc>().add(OrderSubmitted());
-                  }
+              context.read<OrderInfoBloc>().add(OrderSubmitted());
+            }
                 : null,
             color: AppTheme.listTextColor,
             label: Text(
@@ -356,54 +356,54 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   Widget searchRadioButton() {
     return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
         builder: (context, state) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Column(
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Radio(
-                value: 'By Code',
-                groupValue: state.radioGroupValue,
-                onChanged: (value) {
-                  context
-                      .read<OrderInfoBloc>()
-                      .add(ByCodeChanged(byCode: value));
-                },
+              Column(
+                children: [
+                  Radio(
+                    value: 'By Code',
+                    groupValue: state.radioGroupValue,
+                    onChanged: (value) {
+                      context
+                          .read<OrderInfoBloc>()
+                          .add(ByCodeChanged(byCode: value));
+                    },
+                  ),
+                  Text(
+                    'By Code',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                'By Code',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
+              Column(
+                children: [
+                  Radio(
+                    value: 'By Name',
+                    groupValue: state.radioGroupValue,
+                    onChanged: (value) {
+                      context
+                          .read<OrderInfoBloc>()
+                          .add(ByNameChanged(byName: value));
+                    },
+                  ),
+                  Text(
+                    'By Name',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-          Column(
-            children: [
-              Radio(
-                value: 'By Name',
-                groupValue: state.radioGroupValue,
-                onChanged: (value) {
-                  context
-                      .read<OrderInfoBloc>()
-                      .add(ByNameChanged(byName: value));
-                },
-              ),
-              Text(
-                'By Name',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ],
-      );
-    });
+          );
+        });
   }
 
   Widget autoCompleteSearchBar() {
@@ -413,7 +413,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
 
     return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
         builder: (context, state) {
-      /*return AutoCompleteTextField<Member>(
+          /*return AutoCompleteTextField<Member>(
             clearOnSubmit: false,
             style: TextStyle(
               color: Colors.black,
@@ -482,71 +482,71 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
               return a.memberNo.compareTo(b.memberNo.toLowerCase());
             },
           );*/
-      final isPortrait =
-          MediaQuery.of(context).orientation == Orientation.portrait;
+          final isPortrait =
+              MediaQuery.of(context).orientation == Orientation.portrait;
 
-      return FloatingSearchBar(
-        hint: 'Search...',
-        controller: controller,
-        scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
-        transitionDuration: const Duration(milliseconds: 800),
-        automaticallyImplyBackButton: true,
-        transitionCurve: Curves.easeInOut,
-        physics: const BouncingScrollPhysics(),
-        axisAlignment: isPortrait ? 0.0 : -1.0,
-        openAxisAlignment: 0.0,
-        maxWidth: isPortrait ? 600 : 500,
-        debounceDelay: const Duration(milliseconds: 500),
-        onSubmitted: (query){
-          isProgressing = !isProgressing;
-          context.read<OrderInfoBloc>().add(SearchTextChanged(text: query));
-        },
-        transition: CircularFloatingSearchBarTransition(),
-        progress: isProgressing,
-        actions: [
-          FloatingSearchBarAction(
-            showIfOpened: true,
-            child: CircularButton(
-              icon: Icon(Icons.search, color: Colors.blueGrey,),
-              onPressed: () {
-                isProgressing = !isProgressing;
-                context.read<OrderInfoBloc>().add(SearchTextChanged(text: controller.query));
-              },
-            ),
-          ),
-          FloatingSearchBarAction.searchToClear(
-            showIfClosed: true,
-          ),
-        ],
-        closeOnBackdropTap: true,
-        isScrollControlled: true,
-        builder: (context, transition) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Material(
-              color: Colors.white,
-              elevation: 4.0,
-              child: ListView.builder(
-                itemCount: state.membersList.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(state.membersList[index].memberName ?? '...'),
-                    onTap: (){
-                      setState(() {
-                        isProgressing = false;
-                      });
-                      print(state.membersList[index].memberName);
-                      controller.close();
-                    },
-                  );
-                },
+          return FloatingSearchBar(
+            hint: 'Search...',
+            controller: controller,
+            scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+            transitionDuration: const Duration(milliseconds: 800),
+            automaticallyImplyBackButton: true,
+            transitionCurve: Curves.easeInOut,
+            physics: const BouncingScrollPhysics(),
+            axisAlignment: isPortrait ? 0.0 : -1.0,
+            openAxisAlignment: 0.0,
+            maxWidth: isPortrait ? 600 : 500,
+            debounceDelay: const Duration(milliseconds: 500),
+            onSubmitted: (query){
+              isProgressing = !isProgressing;
+              context.read<OrderInfoBloc>().add(SearchTextChanged(text: query));
+            },
+            transition: CircularFloatingSearchBarTransition(),
+            progress: isProgressing,
+            actions: [
+              FloatingSearchBarAction(
+                showIfOpened: true,
+                child: CircularButton(
+                  icon: Icon(Icons.search, color: Colors.blueGrey,),
+                  onPressed: () {
+                    isProgressing = !isProgressing;
+                    context.read<OrderInfoBloc>().add(SearchTextChanged(text: controller.query));
+                  },
+                ),
               ),
-            ),
+              FloatingSearchBarAction.searchToClear(
+                showIfClosed: true,
+              ),
+            ],
+            closeOnBackdropTap: true,
+            isScrollControlled: true,
+            builder: (context, transition) {
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Material(
+                  color: Colors.white,
+                  elevation: 4.0,
+                  child: ListView.builder(
+                    itemCount: state.membersList.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(state.membersList[index].memberName ?? '...'),
+                        onTap: (){
+                          setState(() {
+                            isProgressing = false;
+                          });
+                          print(state.membersList[index].memberName);
+                          controller.close();
+                        },
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
           );
-        },
-      );
-    });
+        });
   }
 
   Widget autoCompleteSearchBarRow(

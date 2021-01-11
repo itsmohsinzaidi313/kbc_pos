@@ -1,4 +1,3 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:formz/formz.dart';
 import 'package:kbc_pos/models/model_order_info/table_no.dart';
@@ -7,7 +6,7 @@ import 'package:kbc_pos/models/objects/location.dart';
 import 'package:kbc_pos/models/objects/member.dart';
 import 'package:kbc_pos/models/objects/session.dart';
 
-class MyOrderInfoStates extends Equatable {
+class MyOrderInfoStates {
   final List<Member> membersList;
   final List<DropdownMenuItem<Location>> locationList;
   final List<DropdownMenuItem<Session>> sessionList;
@@ -19,40 +18,43 @@ class MyOrderInfoStates extends Equatable {
   final FormzStatus status;
   final Waiter waiter;
   final TableNo tableNo;
-  final Member selectedMember;
+  final List<Member> selectedMember;
+  final String byCode, byName, radioGroupValue;
 
   MyOrderInfoStates(
       {this.membersList = const [],
-      this.locationList = const [],
-      this.sessionList = const [],
-      this.error = '',
-      this.withSpouse = false,
-      this.atParty = false,
-      this.selectedLocation = const Location(),
-      this.selectedSession = const Session(),
-      this.status = FormzStatus.pure,
-      this.waiter = const Waiter.pure(),
-      this.tableNo = const TableNo.pure(),
-      this.selectedMember = const Member()
-      });
+        this.locationList = const [],
+        this.sessionList = const [],
+        this.error = '',
+        this.withSpouse = false,
+        this.atParty = false,
+        this.selectedLocation = const Location(),
+        this.selectedSession = const Session(),
+        this.status = FormzStatus.pure,
+        this.waiter = const Waiter.pure(),
+        this.tableNo = const TableNo.pure(),
+        this.selectedMember = const [],
+        this.byCode = 'By Code',
+        this.byName = 'By Name',
+        this.radioGroupValue = 'By Code'});
 
   MyOrderInfoStates copyWith(
       {List<Member> membersList,
-      List<DropdownMenuItem<Location>> venueList,
-      List<DropdownMenuItem<Session>> sessionList,
-      String error,
-      String hintText,
-      bool withSpouse,
-      bool atParty,
-      String byCode,
-      String byName,
-      String radioGroupValue,
-      Location selectedLocation,
-      Session selectedSession,
-      Waiter waiter,
-      TableNo tableNo,
-      Member selectedMember,
-      FormzStatus status}) {
+        List<DropdownMenuItem<Location>> venueList,
+        List<DropdownMenuItem<Session>> sessionList,
+        String error,
+        String hintText,
+        bool withSpouse,
+        bool atParty,
+        String radioGroupValue,
+        Location selectedLocation,
+        Session selectedSession,
+        Waiter waiter,
+        TableNo tableNo,
+        List<Member> selectedMember,
+        String byCode,
+        String byName,
+        FormzStatus status}) {
     return MyOrderInfoStates(
         membersList: membersList ?? this.membersList,
         locationList: venueList ?? this.locationList,
@@ -65,25 +67,11 @@ class MyOrderInfoStates extends Equatable {
         withSpouse: withSpouse ?? this.withSpouse,
         waiter: waiter ?? this.waiter,
         tableNo: tableNo ?? this.tableNo,
-        selectedMember: selectedMember ?? this.selectedMember
-    );
+        byCode: byCode ?? this.byCode,
+        byName: byName ?? this.byName,
+        radioGroupValue: radioGroupValue ?? this.radioGroupValue,
+        selectedMember: selectedMember ?? this.selectedMember);
   }
-
-  @override
-  List<Object> get props => [
-        membersList,
-        locationList,
-        sessionList,
-        error,
-        status,
-        atParty,
-        selectedLocation,
-        selectedSession,
-        withSpouse,
-        waiter,
-        tableNo,
-        selectedMember
-      ];
 }
 
 class FetchingListInProgress extends MyOrderInfoStates {}

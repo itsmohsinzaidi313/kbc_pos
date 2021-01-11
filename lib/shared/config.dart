@@ -6,12 +6,12 @@ class Config {
 
   //region ___ALL APIS___
   static final String ipAddress = "192.168.18.250";
-  static final String ipAddress = "192.168.18.250";
   static final String commonAPI = "http://$ipAddress/kbc/data";
   static final String key = "?key=123";
   static final String getCategoryAPI = "$commonAPI/getcategories$key";
   static final String getItemsAPI = "$commonAPI/getitems$key&categoryid=";
   static String loginUserAPI = "$commonAPI/getuser$key&";
+  static final String getMembersAPI = "$commonAPI/searchmember$key&phrase=";
 
   setLoginUserAPI(String username, String password){
     loginUserAPI = "${loginUserAPI}username=$username&password=$password";
