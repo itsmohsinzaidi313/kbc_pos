@@ -15,6 +15,7 @@ import 'package:kbc_pos/models/objects/session.dart';
 import 'package:kbc_pos/shared/app_theme.dart';
 import 'package:kbc_pos/shared/config.dart';
 import 'package:formz/formz.dart';
+import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'custom_widget_classes/custom_appbar.dart';
 
 class OrderInfoScreen extends StatefulWidget {
@@ -76,6 +77,10 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Order Info'),
+        backgroundColor: Colors.red,
+      ),
       body: BlocListener<OrderInfoBloc, MyOrderInfoStates>(
         listenWhen: (previous, current) => previous != current,
         listener: (context, state) {
@@ -95,92 +100,219 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
           width: Config.getDeviceWidth(context),
           height: Config.getDeviceHeight(context),
           child: SingleChildScrollView(
-            child: Column(
+            child: Stack(
               children: [
-                CustomAppBar(
-                  appBarTitle: 'Order Information',
-                  searchBar: autoCompleteSearchBar(),
-                  radioButtons: searchRadioButton(),
-                  onBackPressed: () => Navigator.pop(context),
-                ),
-                BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
-                  builder: (context, state) {
-                    return Column(
+/*                Column(
+                  children: [
+                    CustomAppBar(
+                      appBarTitle: 'Order Information',
+                      searchBar: autoCompleteSearchBar(),
+                      radioButtons: searchRadioButton(),
+                      onBackPressed: () => Navigator.pop(context),
+                    ),
+                    BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+                      builder: (context, state) {
+                        return Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CustomLabelledTextView(
+                                  labelName: 'Member Name',
+                                  text: '...',
+                                  // text: state.selectedMember[0].memberName ?? '...',
+                                ),
+                                CustomLabelledTextView(
+                                  labelName: 'Member Code',
+                                  text: '...',
+                                  // text: state.selectedMember[0].memberNo ?? '...',
+                                ),
+                                CustomLabelledTextView(
+                                  labelName: 'Member Status',
+                                  text: '...',
+                                  // text: state.selectedMember[0].memberStatus ?? '...',
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CustomLabelledTextView(
+                                  labelName: 'Order No.',
+                                  text: '...',
+                                ),
+                                CustomLabelledTextView(
+                                  labelName: 'Covers',
+                                  text: '...',
+                                ),
+                                CustomLabelledTextView(
+                                  labelName: 'Slip',
+                                  text: '...',
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            CustomLabelledTextView(
-                              labelName: 'Member Name',
-                              text: state.selectedMember.memberName ?? '...',
-                            ),
-                            CustomLabelledTextView(
-                              labelName: 'Member Code',
-                              text: state.selectedMember.memberNo ?? '...',
-                            ),
-                            CustomLabelledTextView(
-                              labelName: 'Member Status',
-                              text: state.selectedMember.memberStatus ?? '...',
-                            ),
-                          ],
+                        LocationDropdown(),
+                        SessionDropdown(),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        WaiterInput(
+                          focusNode: _waiterFocusNode,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            CustomLabelledTextView(
-                              labelName: 'Order No.',
-                              text: '...',
-                            ),
-                            CustomLabelledTextView(
-                              labelName: 'Covers',
-                              text: '...',
-                            ),
-                            CustomLabelledTextView(
-                              labelName: 'Slip',
-                              text: '...',
-                            ),
-                          ],
+                        TableInput(
+                          focusNode: _tableNoFocusNode,
                         ),
                       ],
-                    );
-                  },
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    LocationDropdown(),
-                    SessionDropdown(),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    WaiterInput(
-                      focusNode: _waiterFocusNode,
                     ),
-                    TableInput(
-                      focusNode: _tableNoFocusNode,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        AtPartyCheckBox(),
+                        WithSpouseCheckBox(),
+                      ],
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(
+                        vertical: 20.0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          submitButton(),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    // AtPartyCheckBox(),
-                    WithSpouseCheckBox(),
-                  ],
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(
-                    vertical: 20.0,
+                Positioned(
+                  top: 100,
+                  left: 20,
+                  child: Container(
+                    width: double.infinity,
+                    height: 200,
+                    color: Colors.green,
+
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                ),*/
+                Container(
+                  height: Config.getDeviceHeight(context),
+                  width: Config.getDeviceWidth(context),
+                  child: Column(
                     children: [
-                      submitButton(),
+                      /*CustomAppBar(
+                      appBarTitle: 'Order Information',
+                      searchBar: autoCompleteSearchBar(),
+                      radioButtons: searchRadioButton(),
+                      onBackPressed: () => Navigator.pop(context),
+                    ),*/
+                      BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+                        builder: (context, state) {
+                          return Column(
+                            children: [
+                              SizedBox(
+                                height: Config.getDeviceHeight(context) * 0.2,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  CustomLabelledTextView(
+                                    labelName: 'Member Name',
+                                    text: '...',
+                                    // text: state.selectedMember[0].memberName ?? '...',
+                                  ),
+                                  CustomLabelledTextView(
+                                    labelName: 'Member Code',
+                                    text: '...',
+                                    // text: state.selectedMember[0].memberNo ?? '...',
+                                  ),
+                                  CustomLabelledTextView(
+                                    labelName: 'Member Status',
+                                    text: '...',
+                                    // text: state.selectedMember[0].memberStatus ?? '...',
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  CustomLabelledTextView(
+                                    labelName: 'Order No.',
+                                    text: '...',
+                                  ),
+                                  CustomLabelledTextView(
+                                    labelName: 'Covers',
+                                    text: '...',
+                                  ),
+                                  CustomLabelledTextView(
+                                    labelName: 'Slip',
+                                    text: '...',
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          LocationDropdown(),
+                          SessionDropdown(),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          WaiterInput(
+                            focusNode: _waiterFocusNode,
+                          ),
+                          TableInput(
+                            focusNode: _tableNoFocusNode,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          AtPartyCheckBox(),
+                          WithSpouseCheckBox(),
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                          vertical: 20.0,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            submitButton(),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
+                Positioned(
+                  top: 10,
+                  left: 10,
+                  right: 10,
+                  child: Container(
+                    height: Config.getDeviceHeight(context),
+                    width: Config.getDeviceWidth(context),
+                    child: autoCompleteSearchBar(),
+                  ),
+                ),
+
+
               ],
             ),
           ),
@@ -196,8 +328,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
           width: Config.getDeviceWidth(context) * 0.4,
           height: Config.getDeviceHeight(context) * 0.08,
           child: RaisedButton.icon(
-            onPressed: (state.status.isValidated &&
-                    state.selectedMember.memberName != null)
+            onPressed: state.status.isValidated
                 ? () {
                     context.read<OrderInfoBloc>().add(OrderSubmitted());
                   }
@@ -223,69 +354,66 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   }
 
   Widget searchRadioButton() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Column(
-          children: [
-            Radio(
-              value: 'By Code',
-              groupValue: radioGroupValue,
-              onChanged: (value) {
-                setState(() {
-                  radioGroupValue = value;
-                });
-              },
-            ),
-            Text(
-              'By Code',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+    return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+        builder: (context, state) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            children: [
+              Radio(
+                value: 'By Code',
+                groupValue: state.radioGroupValue,
+                onChanged: (value) {
+                  context
+                      .read<OrderInfoBloc>()
+                      .add(ByCodeChanged(byCode: value));
+                },
               ),
-            ),
-          ],
-        ),
-        Column(
-          children: [
-            Radio(
-              value: 'By Name',
-              groupValue: radioGroupValue,
-              onChanged: (value) {
-                setState(() {
-                  radioGroupValue = value;
-                });
-              },
-            ),
-            Text(
-              'By Name',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+              Text(
+                'By Code',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
-    );
+            ],
+          ),
+          Column(
+            children: [
+              Radio(
+                value: 'By Name',
+                groupValue: state.radioGroupValue,
+                onChanged: (value) {
+                  context
+                      .read<OrderInfoBloc>()
+                      .add(ByNameChanged(byName: value));
+                },
+              ),
+              Text(
+                'By Name',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    });
   }
 
   Widget autoCompleteSearchBar() {
-    return FutureBuilder(
-      builder: (context, snapshot) {
-        if (snapshot.hasData == null &&
-            snapshot.connectionState == ConnectionState.none) {
-          return Container(
-            child: Center(
-              child: Text('Progressing..'),
-            ),
-          );
-        } else if (snapshot.hasError) {
-          print(snapshot.error);
-        } else if (snapshot.hasData) {
-          return AutoCompleteTextField<Member>(
+    final controller = FloatingSearchBarController();
+    bool isProgressing = false;
+    Timer _debounce;
+
+    return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+        builder: (context, state) {
+      /*return AutoCompleteTextField<Member>(
             clearOnSubmit: false,
             style: TextStyle(
               color: Colors.black,
@@ -308,54 +436,117 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
             keyboardType: TextInputType.text,
             controller: _autoCompleteController,
             textChanged: (value) {
-              print(value);
+              context.read<OrderInfoBloc>().add(SearchTextChanged(text: value));
             },
             itemSubmitted: (item) async {
-              _autoCompleteController.text = radioGroupValue == 'By Code'
+              _autoCompleteController.text = state.radioGroupValue == 'By Code'
                   ? item.memberNo
                   : item.memberName;
               context.read<OrderInfoBloc>().add(SelectedMember(member: item));
             },
             key: _key,
-            suggestions: snapshot.data,
+            suggestions: state.membersList,
             itemBuilder: (context, item) {
-              return radioGroupValue == 'By Code'
-                  ? autoCompleteSearchBarRow(
-                      item: item.memberNo, icon: Icon(Icons.person))
-                  : autoCompleteSearchBarRow(
-                      item: item.memberName, icon: Icon(Icons.person));
-              // return autoCompleteSearchBarRow(
-              //     item: item.memberNo, icon: Icon(Icons.person));
+              print(item);
+              // return state.radioGroupValue == 'By Code'
+              //     ? autoCompleteSearchBarRow(
+              //         item: item.memberNo, icon: Icon(Icons.person))
+              //     : autoCompleteSearchBarRow(
+              //         item: item.memberName, icon: Icon(Icons.person));
+              return autoCompleteSearchBarRow(
+                  item: item.memberNo, icon: Icon(Icons.person));
             },
             itemFilter: (item, query) {
-              bool _itemFilter;
-              if (_autoCompleteController.text.isNotEmpty) {
-                _itemFilter = radioGroupValue == 'By Code'
-                    ? item.memberNo
-                        .toLowerCase()
-                        .startsWith(query.toLowerCase())
-                    : item.memberName
-                        .toLowerCase()
-                        .startsWith(query.toLowerCase());
-              } else {
-                _autoCompleteController.text = '';
-                _itemFilter = false;
-              }
-              return _itemFilter;
-              // return item.memberNo.toLowerCase().startsWith(query.toLowerCase());
+              print(query);
+              // bool _itemFilter;
+              // if (_autoCompleteController.text.isNotEmpty) {
+              //   _itemFilter = state.radioGroupValue == 'By Code'
+              //       ? item.memberNo
+              //           .toLowerCase()
+              //           .startsWith(query.toLowerCase())
+              //       : item.memberName
+              //           .toLowerCase()
+              //           .startsWith(query.toLowerCase());
+              // } else {
+              //   _autoCompleteController.text = '';
+              //   _itemFilter = false;
+              // }
+              // return _itemFilter;
+              return item.memberNo.toLowerCase().startsWith(query.toLowerCase());
             },
             itemSorter: (a, b) {
-              return radioGroupValue == 'By Code'
-                  ? a.memberNo.compareTo(b.memberNo.toLowerCase())
-                  : a.memberName.compareTo(b.memberName.toLowerCase());
-              // return a.memberNo.compareTo(b.memberNo.toLowerCase());
+              // return state.radioGroupValue == 'By Code'
+              //     ? a.memberNo.compareTo(b.memberNo.toLowerCase())
+              //     : a.memberName.compareTo(b.memberName.toLowerCase());
+              print(b);
+              return a.memberNo.compareTo(b.memberNo.toLowerCase());
             },
+          );*/
+      final isPortrait =
+          MediaQuery.of(context).orientation == Orientation.portrait;
+
+      return FloatingSearchBar(
+        hint: 'Search...',
+        controller: controller,
+        scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+        transitionDuration: const Duration(milliseconds: 800),
+        automaticallyImplyBackButton: true,
+        transitionCurve: Curves.easeInOut,
+        physics: const BouncingScrollPhysics(),
+        axisAlignment: isPortrait ? 0.0 : -1.0,
+        openAxisAlignment: 0.0,
+        maxWidth: isPortrait ? 600 : 500,
+        debounceDelay: const Duration(milliseconds: 500),
+        onSubmitted: (query){
+          isProgressing = !isProgressing;
+          context.read<OrderInfoBloc>().add(SearchTextChanged(text: query));
+        },
+        transition: CircularFloatingSearchBarTransition(),
+        progress: isProgressing,
+        actions: [
+          FloatingSearchBarAction(
+            showIfOpened: true,
+            child: CircularButton(
+              icon: Icon(Icons.search, color: Colors.blueGrey,),
+              onPressed: () {
+                isProgressing = !isProgressing;
+                context.read<OrderInfoBloc>().add(SearchTextChanged(text: controller.query));
+              },
+            ),
+          ),
+          FloatingSearchBarAction.searchToClear(
+            showIfClosed: true,
+          ),
+        ],
+        closeOnBackdropTap: true,
+        isScrollControlled: true,
+        builder: (context, transition) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Material(
+              color: Colors.white,
+              elevation: 4.0,
+              child: ListView.builder(
+                itemCount: state.membersList.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(state.membersList[index].memberName ?? '...'),
+                    onTap: (){
+                      setState(() {
+                        isProgressing = false;
+                      });
+                      print(state.membersList[index].memberName);
+                      controller.close();
+                    },
+                  );
+                },
+              ),
+            ),
           );
-        }
-        return Container();
-      },
-      future: getMembers(),
-    );
+        },
+      );
+    });
   }
 
   Widget autoCompleteSearchBarRow(
@@ -428,51 +619,32 @@ class LocationDropdown extends StatelessWidget {
       builder: (context, state) {
         return Flexible(
           flex: 1,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 5.0,
-                  top: 3.0,
-                ),
-                child: Text(
-                  'Select Venue: ',
-                  style: GoogleFonts.ubuntuCondensed(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[700],
-                    letterSpacing: 1.0,
-                  ),
-                ),
+          child: Container(
+            padding: EdgeInsets.all(3.0),
+            margin: EdgeInsets.all(5.0),
+            height: Config.getDeviceHeight(context) * 0.1,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(5.0),
+            ),
+            child: DropdownButton<Location>(
+              icon: Icon(Icons.arrow_drop_down_circle),
+              iconSize: 24,
+              elevation: 16,
+              value: state.selectedLocation,
+              isExpanded: true,
+              style: TextStyle(
+                color: Colors.grey[700],
               ),
-              Container(
-                padding: EdgeInsets.all(3.0),
-                margin: EdgeInsets.all(5.0),
-                height: Config.getDeviceHeight(context) * 0.1,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                child: DropdownButton<Location>(
-                  icon: Icon(Icons.arrow_drop_down_circle),
-                  iconSize: 24,
-                  elevation: 16,
-                  value: state.selectedLocation,
-                  isExpanded: true,
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                  ),
-                  onChanged: (newValue) {
-                    context.read<OrderInfoBloc>()
-                        .add(SelectedLocation(location: newValue));
-                  },
-                  items: state.locationList,
-                ),
-              ),
-            ],
+              onChanged: (newValue) {
+                context
+                    .read<OrderInfoBloc>()
+                    .add(SelectedLocation(location: newValue));
+              },
+              items: state.locationList,
+            ),
           ),
         );
       },
@@ -487,52 +659,32 @@ class SessionDropdown extends StatelessWidget {
       builder: (context, state) {
         return Flexible(
           flex: 1,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 5.0,
-                  top: 3.0,
-                ),
-                child: Text(
-                  'Select Session: ',
-                  style: GoogleFonts.ubuntuCondensed(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[700],
-                    letterSpacing: 1.0,
-                  ),
-                ),
+          child: Container(
+            padding: EdgeInsets.all(3.0),
+            margin: EdgeInsets.all(5.0),
+            height: Config.getDeviceHeight(context) * 0.1,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(5.0),
+            ),
+            child: DropdownButton<Session>(
+              icon: Icon(Icons.arrow_drop_down_circle),
+              iconSize: 24,
+              elevation: 16,
+              value: state.selectedSession,
+              isExpanded: true,
+              style: TextStyle(
+                color: Colors.grey[700],
               ),
-              Container(
-                padding: EdgeInsets.all(3.0),
-                margin: EdgeInsets.all(5.0),
-                height: Config.getDeviceHeight(context) * 0.1,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                child: DropdownButton<Session>(
-                  icon: Icon(Icons.arrow_drop_down_circle),
-                  iconSize: 24,
-                  elevation: 16,
-                  value: state.selectedSession,
-                  isExpanded: true,
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                  ),
-                  onChanged: (newValue) {
-                    context
-                        .read<OrderInfoBloc>()
-                        .add(SelectedSession(session: newValue));
-                  },
-                  items: state.sessionList,
-                ),
-              ),
-            ],
+              onChanged: (newValue) {
+                context
+                    .read<OrderInfoBloc>()
+                    .add(SelectedSession(session: newValue));
+              },
+              items: state.sessionList,
+            ),
           ),
         );
       },
