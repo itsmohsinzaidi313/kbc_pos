@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kbc_pos/models/objects/location.dart';
 import 'package:kbc_pos/models/objects/member.dart';
+import 'package:kbc_pos/models/objects/order.dart';
 import 'package:kbc_pos/models/objects/session.dart';
 
 abstract class OrderInfoEvent {
@@ -72,9 +73,17 @@ class SearchTextChanged extends OrderInfoEvent{
   const SearchTextChanged({ this.text});
 }
 
+class RemoveMember extends OrderInfoEvent{
+  final Member member;
+  RemoveMember({this.member});
+}
+
 class WaiterUnfocused extends OrderInfoEvent{}
 
 class TableNoUnfocused extends OrderInfoEvent{}
 
-class OrderSubmitted extends OrderInfoEvent{}
+class OrderSubmitted extends OrderInfoEvent{
+  final Order order;
+  OrderSubmitted({ this.order});
+}
 

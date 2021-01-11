@@ -4,6 +4,7 @@ import 'package:kbc_pos/models/model_order_info/table_no.dart';
 import 'package:kbc_pos/models/model_order_info/waiter.dart';
 import 'package:kbc_pos/models/objects/location.dart';
 import 'package:kbc_pos/models/objects/member.dart';
+import 'package:kbc_pos/models/objects/order.dart';
 import 'package:kbc_pos/models/objects/session.dart';
 
 class MyOrderInfoStates {
@@ -20,6 +21,8 @@ class MyOrderInfoStates {
   final TableNo tableNo;
   final List<Member> selectedMember;
   final String byCode, byName, radioGroupValue;
+  final String orderNo, slip, cover;
+  final Order order;
 
   MyOrderInfoStates(
       {this.membersList = const [],
@@ -36,7 +39,12 @@ class MyOrderInfoStates {
         this.selectedMember = const [],
         this.byCode = 'By Code',
         this.byName = 'By Name',
-        this.radioGroupValue = 'By Code'});
+        this.radioGroupValue = 'By Code',
+        this.orderNo = '',
+        this.slip = '',
+        this.cover = '',
+        this.order =  const Order()
+      });
 
   MyOrderInfoStates copyWith(
       {List<Member> membersList,
@@ -54,7 +62,12 @@ class MyOrderInfoStates {
         List<Member> selectedMember,
         String byCode,
         String byName,
-        FormzStatus status}) {
+        FormzStatus status,
+        String orderNo,
+        String slip,
+        String cover,
+        Order order
+      }) {
     return MyOrderInfoStates(
         membersList: membersList ?? this.membersList,
         locationList: venueList ?? this.locationList,
@@ -70,7 +83,12 @@ class MyOrderInfoStates {
         byCode: byCode ?? this.byCode,
         byName: byName ?? this.byName,
         radioGroupValue: radioGroupValue ?? this.radioGroupValue,
-        selectedMember: selectedMember ?? this.selectedMember);
+        selectedMember: selectedMember ?? this.selectedMember,
+      orderNo: orderNo ?? this.orderNo,
+      cover: cover ?? this.cover,
+      slip: slip ?? this.slip,
+      order: order ?? this.order
+    );
   }
 }
 

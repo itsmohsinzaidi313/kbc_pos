@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:toast/toast.dart';
-
 
 class AppTheme {
   static final Color appBarColor = Colors.red;
@@ -87,17 +87,21 @@ class AppTheme {
           Color color,
           bool barrier = true,
           Widget content,
-          Widget widget,
           List<FlatButton> buttons}) =>
       showDialog(
           context: context,
           barrierDismissible: barrier,
           builder: (BuildContext context) => AlertDialog(
-                title: Container(
-                    color: Colors.red,
-                    child: Center(
-                      child: widget,
-                    )),
+                title: Center(
+                  child: Text(
+                    title,
+                    style: GoogleFonts.ubuntuCondensed(
+                      color: color ?? Colors.black,
+                      fontSize: fontSize ?? 15,
+                      fontWeight: fontWeight ?? FontWeight.normal,
+                    ),
+                  ),
+                ),
                 content: content,
                 actions: buttons,
                 shape: RoundedRectangleBorder(
@@ -105,11 +109,11 @@ class AppTheme {
               ));
 
   static ProgressDialog showProgressDialog(BuildContext context,
-      {Widget widget,bool isDismissible = true}) {
+      {Widget widget, bool isDismissible = true}) {
     final spinKit = new SpinKitCircle(
       itemBuilder: (context, index) => DecoratedBox(
         decoration: BoxDecoration(
-            color: appThemeColor,
+          color: appThemeColor,
           shape: BoxShape.circle,
         ),
       ),
@@ -161,25 +165,23 @@ class AppTheme {
                 borderRadius: BorderRadius.circular(8))));
   }
 
-  static Future<bool> showAlertDialogYNFutureReturn(
-      BuildContext context,
-      {String title, String message, Function onYes, Function onNo}
-      ) async {
+  static Future<bool> showAlertDialogYNFutureReturn(BuildContext context,
+      {String title, String message, Function onYes, Function onNo}) async {
     await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (value) => AlertDialog(
-          title: text(text: title, fontWeight: FontWeight.bold, fontSize: 20),
-          content: text(text: message),
-          actions: [
-            FlatButton(
-                child: text(text: 'Yes', color: Colors.blue),
-                onPressed: onYes),
-            FlatButton(
-                child: text(text: 'No', color: Colors.blue), onPressed: onNo)
-          ],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8))));
+        context: context,
+        barrierDismissible: false,
+        builder: (value) => AlertDialog(
+            title: text(text: title, fontWeight: FontWeight.bold, fontSize: 20),
+            content: text(text: message),
+            actions: [
+              FlatButton(
+                  child: text(text: 'Yes', color: Colors.blue),
+                  onPressed: onYes),
+              FlatButton(
+                  child: text(text: 'No', color: Colors.blue), onPressed: onNo)
+            ],
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8))));
     return true;
   }
 
@@ -221,8 +223,11 @@ class AppTheme {
             ));
   }
 
-  static void showToast(String msg, BuildContext context){
-    Toast.show(msg, context, backgroundColor: Colors.redAccent, textColor: Colors.white, duration: 2);
+  static void showToast(String msg, BuildContext context) {
+    Toast.show(msg, context,
+        backgroundColor: Colors.redAccent,
+        textColor: Colors.white,
+        duration: 2);
   }
 
   static void mySnackBar({BuildContext context, String msg}) {

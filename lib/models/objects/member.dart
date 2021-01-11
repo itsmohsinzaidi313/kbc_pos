@@ -23,7 +23,7 @@ class Member{
           memberNo: json[mCode],
           memberName: json[mName],
           memberStatus: json[mStatus],
-          memberElectDate: json[mYear]
+          memberElectDate: json[mYear].toString()
       );
 
   Map<String, dynamic> toJson() => {

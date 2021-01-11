@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_bloc.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_events.dart';
+import 'package:kbc_pos/bloc/order_info_bloc/order_info_states.dart';
 import 'package:kbc_pos/bloc/pos_bloc/pos_bloc.dart';
 import 'package:kbc_pos/bloc/pos_bloc/pos_events.dart';
 import 'package:kbc_pos/bloc/pos_bloc/pos_states.dart';
@@ -30,12 +31,22 @@ class _PosScreenState extends State<PosScreen> {
 
   String radioGroupValue = 'By Code';
   final TextEditingController _autoCompleteController = TextEditingController();
+  OrderInfoBloc _myOrderInfoBloc;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     context.read<PosBloc>().add(FetchAllLists());
+    _myOrderInfoBloc = BlocProvider.of<OrderInfoBloc>(context);
+    print(_myOrderInfoBloc.state.order.toString());
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _myOrderInfoBloc.close();
   }
 
   @override

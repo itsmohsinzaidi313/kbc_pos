@@ -46,7 +46,7 @@ void main() {
       ],
       child: new MaterialApp(
         title: 'POS',
-        initialRoute: '/dashboardScreen',
+        initialRoute: '/orderInfoScreen',
         routes: {
           '/splashScreen': (context) => SplashScreen(),
           '/loginScreen': (context) => LoginScreen(),

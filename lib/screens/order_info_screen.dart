@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +10,12 @@ import 'package:kbc_pos/bloc/order_info_bloc/order_info_events.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_states.dart';
 import 'package:kbc_pos/models/objects/location.dart';
 import 'package:kbc_pos/models/objects/member.dart';
+import 'package:kbc_pos/models/objects/order.dart';
 import 'package:kbc_pos/models/objects/session.dart';
 import 'package:kbc_pos/shared/app_theme.dart';
 import 'package:kbc_pos/shared/config.dart';
 import 'package:formz/formz.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
-import 'custom_widget_classes/custom_appbar.dart';
 
 class OrderInfoScreen extends StatefulWidget {
   @override
@@ -27,35 +26,10 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   String radioGroupValue = 'By Code';
   final TextEditingController _autoCompleteController = TextEditingController();
   GlobalKey<AutoCompleteTextFieldState<Member>> _key = GlobalKey();
+  final controller = FloatingSearchBarController();
   final _waiterFocusNode = FocusNode();
   final _tableNoFocusNode = FocusNode();
-
-  Future<List<Member>> getMembers() async {
-    List<Member> list;
-    await Future.delayed(Duration(seconds: 1), () {
-      list = [
-        Member(
-            memberId: 1,
-            memberNo: '1220',
-            memberType: 'PL',
-            memberStatus: 'E',
-            memberName: 'MR. C. G. KHARAS'),
-        Member(
-            memberId: 1,
-            memberNo: '1856',
-            memberType: 'PO',
-            memberStatus: 'R',
-            memberName: 'MR. USMAN AMINUDDIN'),
-        Member(
-            memberId: 1,
-            memberNo: '2651',
-            memberType: 'PE',
-            memberStatus: 'E',
-            memberName: 'MR. SALEENM A. THARIANI'),
-      ];
-    });
-    return list;
-  }
+  bool isProgressing = false;
 
   @override
   void initState() {
@@ -92,157 +66,68 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
             CircularProgressIndicator();
             // AppTheme.mySnackBar(context: context, msg: 'Please Wait..');
           } else if (state.status.isSubmissionSuccess) {
-            AppTheme.mySnackBar(
-                context: context, msg: 'Order Submitted Successfully..');
+            // AppTheme.mySnackBar(
+            //     context: context, msg: 'Order Submitted Successfully..');
+            Navigator.pushNamed(context, '/posScreen');
           }
         },
         child: Container(
           width: Config.getDeviceWidth(context),
           height: Config.getDeviceHeight(context),
-          child: SingleChildScrollView(
-            child: Stack(
-              children: [
-/*                Column(
-                  children: [
-                    CustomAppBar(
-                      appBarTitle: 'Order Information',
-                      searchBar: autoCompleteSearchBar(),
-                      radioButtons: searchRadioButton(),
-                      onBackPressed: () => Navigator.pop(context),
-                    ),
-                    BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
-                      builder: (context, state) {
-                        return Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                CustomLabelledTextView(
-                                  labelName: 'Member Name',
-                                  text: '...',
-                                  // text: state.selectedMember[0].memberName ?? '...',
-                                ),
-                                CustomLabelledTextView(
-                                  labelName: 'Member Code',
-                                  text: '...',
-                                  // text: state.selectedMember[0].memberNo ?? '...',
-                                ),
-                                CustomLabelledTextView(
-                                  labelName: 'Member Status',
-                                  text: '...',
-                                  // text: state.selectedMember[0].memberStatus ?? '...',
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                CustomLabelledTextView(
-                                  labelName: 'Order No.',
-                                  text: '...',
-                                ),
-                                CustomLabelledTextView(
-                                  labelName: 'Covers',
-                                  text: '...',
-                                ),
-                                CustomLabelledTextView(
-                                  labelName: 'Slip',
-                                  text: '...',
-                                ),
-                              ],
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        LocationDropdown(),
-                        SessionDropdown(),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        WaiterInput(
-                          focusNode: _waiterFocusNode,
-                        ),
-                        TableInput(
-                          focusNode: _tableNoFocusNode,
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        AtPartyCheckBox(),
-                        WithSpouseCheckBox(),
-                      ],
-                    ),
-                    Container(
-                      margin: EdgeInsets.symmetric(
-                        vertical: 20.0,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          submitButton(),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Positioned(
-                  top: 100,
-                  left: 20,
-                  child: Container(
-                    width: double.infinity,
-                    height: 200,
-                    color: Colors.green,
-
-                  ),
-                ),*/
-                Container(
-                  height: Config.getDeviceHeight(context),
-                  width: Config.getDeviceWidth(context),
+          child: Stack(
+            children: [
+              Container(
+                height: Config.getDeviceHeight(context),
+                width: Config.getDeviceWidth(context),
+                child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      /*CustomAppBar(
-                      appBarTitle: 'Order Information',
-                      searchBar: autoCompleteSearchBar(),
-                      radioButtons: searchRadioButton(),
-                      onBackPressed: () => Navigator.pop(context),
-                    ),*/
                       BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
                         builder: (context, state) {
                           return Column(
                             children: [
                               SizedBox(
-                                height: Config.getDeviceHeight(context) * 0.2,
+                                height: Config.getDeviceHeight(context) * 0.13,
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  seeMultipleMembers(
+                                      context: context,
+                                      member: state.selectedMember),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   CustomLabelledTextView(
                                     labelName: 'Member Name',
-                                    text: '...',
+                                    text: state.selectedMember.length > 0
+                                        ? state.selectedMember.last?.memberName
+                                        : '...',
                                     // text: state.selectedMember[0].memberName ?? '...',
                                   ),
                                   CustomLabelledTextView(
                                     labelName: 'Member Code',
-                                    text: '...',
+                                    text: state.selectedMember.length > 0
+                                        ? state.selectedMember.last?.memberNo
+                                        : '...',
                                     // text: state.selectedMember[0].memberNo ?? '...',
                                   ),
                                   CustomLabelledTextView(
                                     labelName: 'Member Status',
-                                    text: '...',
+                                    text: state.selectedMember.length > 0
+                                        ? state
+                                            .selectedMember.last?.memberStatus
+                                        : '...',
                                     // text: state.selectedMember[0].memberStatus ?? '...',
                                   ),
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   CustomLabelledTextView(
                                     labelName: 'Order No.',
@@ -280,13 +165,13 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                           ),
                         ],
                       ),
-                      Row(
+                      /*Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           AtPartyCheckBox(),
                           WithSpouseCheckBox(),
                         ],
-                      ),
+                      ),*/
                       Container(
                         margin: EdgeInsets.symmetric(
                           vertical: 20.0,
@@ -301,20 +186,18 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                     ],
                   ),
                 ),
-                Positioned(
-                  top: 10,
-                  left: 10,
-                  right: 10,
-                  child: Container(
-                    height: Config.getDeviceHeight(context),
-                    width: Config.getDeviceWidth(context),
-                    child: autoCompleteSearchBar(),
-                  ),
+              ),
+              Positioned(
+                top: 10,
+                left: 10,
+                right: 10,
+                child: Container(
+                  height: Config.getDeviceHeight(context),
+                  width: Config.getDeviceWidth(context),
+                  child: autoCompleteSearchBar(),
                 ),
-
-
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -330,8 +213,18 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
           child: RaisedButton.icon(
             onPressed: state.status.isValidated
                 ? () {
-              context.read<OrderInfoBloc>().add(OrderSubmitted());
-            }
+                    context.read<OrderInfoBloc>().add(
+                        OrderSubmitted(order: Order(
+                          member: state.selectedMember,
+                          orderNo: state.orderNo,
+                          slip: state.slip,
+                          cover: state.cover,
+                          waiter: state.waiter.value,
+                          table: state.tableNo.value,
+                          session: state.selectedSession.sessionId.toString(),
+                          venue: state.selectedLocation.locationId.toString()
+                        )));
+                  }
                 : null,
             color: AppTheme.listTextColor,
             label: Text(
@@ -356,197 +249,142 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   Widget searchRadioButton() {
     return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
         builder: (context, state) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
             children: [
-              Column(
-                children: [
-                  Radio(
-                    value: 'By Code',
-                    groupValue: state.radioGroupValue,
-                    onChanged: (value) {
-                      context
-                          .read<OrderInfoBloc>()
-                          .add(ByCodeChanged(byCode: value));
-                    },
-                  ),
-                  Text(
-                    'By Code',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+              Radio(
+                value: 'By Code',
+                groupValue: state.radioGroupValue,
+                onChanged: (value) {
+                  context
+                      .read<OrderInfoBloc>()
+                      .add(ByCodeChanged(byCode: value));
+                },
               ),
-              Column(
-                children: [
-                  Radio(
-                    value: 'By Name',
-                    groupValue: state.radioGroupValue,
-                    onChanged: (value) {
-                      context
-                          .read<OrderInfoBloc>()
-                          .add(ByNameChanged(byName: value));
-                    },
-                  ),
-                  Text(
-                    'By Name',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+              Text(
+                'By Code',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ],
-          );
-        });
+          ),
+          Column(
+            children: [
+              Radio(
+                value: 'By Name',
+                groupValue: state.radioGroupValue,
+                onChanged: (value) {
+                  context
+                      .read<OrderInfoBloc>()
+                      .add(ByNameChanged(byName: value));
+                },
+              ),
+              Text(
+                'By Name',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    });
   }
 
   Widget autoCompleteSearchBar() {
-    final controller = FloatingSearchBarController();
-    bool isProgressing = false;
     Timer _debounce;
 
     return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
         builder: (context, state) {
-          /*return AutoCompleteTextField<Member>(
-            clearOnSubmit: false,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 16,
+      final isPortrait =
+          MediaQuery.of(context).orientation == Orientation.portrait;
+
+      return FloatingSearchBar(
+        hint: 'Search...',
+        controller: controller,
+        scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
+        transitionDuration: const Duration(milliseconds: 800),
+        automaticallyImplyBackButton: true,
+        transitionCurve: Curves.easeInOut,
+        physics: const BouncingScrollPhysics(),
+        axisAlignment: isPortrait ? 0.0 : -1.0,
+        openAxisAlignment: 0.0,
+        maxWidth: isPortrait ? 600 : 500,
+        debounceDelay: const Duration(milliseconds: 500),
+        onQueryChanged: (query) {
+          if (query.isNotEmpty) {
+            setState(() => isProgressing = true);
+            if (_debounce?.isActive ?? false) _debounce.cancel();
+            _debounce = Timer(const Duration(seconds: 2), () {
+              context.read<OrderInfoBloc>().add(SearchTextChanged(text: query));
+            });
+          }
+        },
+        onSubmitted: (query) {
+          setState(() => isProgressing = false);
+          context.read<OrderInfoBloc>().add(SearchTextChanged(text: query));
+        },
+        onFocusChanged: (value) {
+          if (value) setState(() => isProgressing = !isProgressing);
+        },
+        transition: CircularFloatingSearchBarTransition(),
+        actions: [
+          FloatingSearchBarAction(
+            showIfOpened: true,
+            child: CircularButton(
+              icon: Icon(
+                Icons.search,
+                color: Colors.blueGrey,
+              ),
+              onPressed: () {
+                context
+                    .read<OrderInfoBloc>()
+                    .add(SearchTextChanged(text: controller.query));
+              },
             ),
-            decoration: InputDecoration(
-              hintText: 'Search Member Here..',
-              border: InputBorder.none,
-              suffixIcon: IconButton(
-                icon: Icon(Icons.cancel),
-                iconSize: 20,
-                color: Colors.yellow[700],
-                onPressed: () {
-                  _autoCompleteController.text = "";
+          ),
+          FloatingSearchBarAction.searchToClear(
+            showIfClosed: true,
+          ),
+        ],
+        progress: isProgressing,
+        closeOnBackdropTap: true,
+        isScrollControlled: true,
+        builder: (context, transition) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Material(
+              color: Colors.white,
+              elevation: 4.0,
+              child: ListView.builder(
+                itemCount: state.membersList.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text(state.membersList[index].memberName ?? '...'),
+                    onTap: () {
+                      setState(() => isProgressing = false);
+                      controller.close();
+                      context.read<OrderInfoBloc>().add(
+                          SelectedMember(member: state.membersList[index]));
+                    },
+                  );
                 },
               ),
-              contentPadding: EdgeInsets.fromLTRB(10, 30, 10, 20),
-              hintStyle: TextStyle(color: Colors.grey),
             ),
-            keyboardType: TextInputType.text,
-            controller: _autoCompleteController,
-            textChanged: (value) {
-              context.read<OrderInfoBloc>().add(SearchTextChanged(text: value));
-            },
-            itemSubmitted: (item) async {
-              _autoCompleteController.text = state.radioGroupValue == 'By Code'
-                  ? item.memberNo
-                  : item.memberName;
-              context.read<OrderInfoBloc>().add(SelectedMember(member: item));
-            },
-            key: _key,
-            suggestions: state.membersList,
-            itemBuilder: (context, item) {
-              print(item);
-              // return state.radioGroupValue == 'By Code'
-              //     ? autoCompleteSearchBarRow(
-              //         item: item.memberNo, icon: Icon(Icons.person))
-              //     : autoCompleteSearchBarRow(
-              //         item: item.memberName, icon: Icon(Icons.person));
-              return autoCompleteSearchBarRow(
-                  item: item.memberNo, icon: Icon(Icons.person));
-            },
-            itemFilter: (item, query) {
-              print(query);
-              // bool _itemFilter;
-              // if (_autoCompleteController.text.isNotEmpty) {
-              //   _itemFilter = state.radioGroupValue == 'By Code'
-              //       ? item.memberNo
-              //           .toLowerCase()
-              //           .startsWith(query.toLowerCase())
-              //       : item.memberName
-              //           .toLowerCase()
-              //           .startsWith(query.toLowerCase());
-              // } else {
-              //   _autoCompleteController.text = '';
-              //   _itemFilter = false;
-              // }
-              // return _itemFilter;
-              return item.memberNo.toLowerCase().startsWith(query.toLowerCase());
-            },
-            itemSorter: (a, b) {
-              // return state.radioGroupValue == 'By Code'
-              //     ? a.memberNo.compareTo(b.memberNo.toLowerCase())
-              //     : a.memberName.compareTo(b.memberName.toLowerCase());
-              print(b);
-              return a.memberNo.compareTo(b.memberNo.toLowerCase());
-            },
-          );*/
-          final isPortrait =
-              MediaQuery.of(context).orientation == Orientation.portrait;
-
-          return FloatingSearchBar(
-            hint: 'Search...',
-            controller: controller,
-            scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
-            transitionDuration: const Duration(milliseconds: 800),
-            automaticallyImplyBackButton: true,
-            transitionCurve: Curves.easeInOut,
-            physics: const BouncingScrollPhysics(),
-            axisAlignment: isPortrait ? 0.0 : -1.0,
-            openAxisAlignment: 0.0,
-            maxWidth: isPortrait ? 600 : 500,
-            debounceDelay: const Duration(milliseconds: 500),
-            onSubmitted: (query){
-              isProgressing = !isProgressing;
-              context.read<OrderInfoBloc>().add(SearchTextChanged(text: query));
-            },
-            transition: CircularFloatingSearchBarTransition(),
-            progress: isProgressing,
-            actions: [
-              FloatingSearchBarAction(
-                showIfOpened: true,
-                child: CircularButton(
-                  icon: Icon(Icons.search, color: Colors.blueGrey,),
-                  onPressed: () {
-                    isProgressing = !isProgressing;
-                    context.read<OrderInfoBloc>().add(SearchTextChanged(text: controller.query));
-                  },
-                ),
-              ),
-              FloatingSearchBarAction.searchToClear(
-                showIfClosed: true,
-              ),
-            ],
-            closeOnBackdropTap: true,
-            isScrollControlled: true,
-            builder: (context, transition) {
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Material(
-                  color: Colors.white,
-                  elevation: 4.0,
-                  child: ListView.builder(
-                    itemCount: state.membersList.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(state.membersList[index].memberName ?? '...'),
-                        onTap: (){
-                          setState(() {
-                            isProgressing = false;
-                          });
-                          print(state.membersList[index].memberName);
-                          controller.close();
-                        },
-                      );
-                    },
-                  ),
-                ),
-              );
-            },
           );
-        });
+        },
+      );
+    });
   }
 
   Widget autoCompleteSearchBarRow(
@@ -554,6 +392,88 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
     return ListTile(
       leading: icon,
       title: Text(item),
+    );
+  }
+
+  Widget seeMultipleMembers({BuildContext context, List<Member> member}) {
+    return Material(
+      child: InkWell(
+        onTap: () async {
+          await _showDialog(member);
+        },
+        child: Container(
+          padding: EdgeInsets.all(12.0),
+          margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
+          decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.green,
+          ),
+          child: Row(
+            children: [
+              Text(
+                member.length > 1 ? 'Multiple Members' : '...',
+                style: GoogleFonts.ubuntuCondensed(
+                  fontSize: 25,
+                  color: Colors.green[50],
+                ),
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Icon(
+                Icons.touch_app_rounded,
+                color: Colors.white,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future _showDialog(List<Member> member) async{
+    return AppTheme.showAlertDialog(
+      context,
+      title: 'ALERT',
+      color: Colors.black,
+      fontWeight: FontWeight.w500,
+      fontSize: 20,
+      buttons: [
+        FlatButton(
+          color: Colors.redAccent,
+          child: Text('Cancel', style: TextStyle(color: Colors.white),),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
+      content: member.length == 0
+          ? Text('List is Empty')
+          : SizedBox(
+        height: Config.getDeviceHeight(context) * 0.5,
+        width: Config.getDeviceHeight(context) * 0.5,
+        child: BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+          builder: (context, state){
+            return ListView.builder(
+              shrinkWrap: true,
+              itemCount: state.selectedMember.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  tileColor: Colors.grey[200],
+                  leading: Icon(Icons.person),
+                  title: Text(state.selectedMember[index].memberName),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red,),
+                    onPressed: () {
+                      context.read<OrderInfoBloc>().add(
+                          RemoveMember(member: state.selectedMember[index]));
+                    },
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
     );
   }
 }
@@ -567,7 +487,7 @@ class CustomLabelledTextView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Flexible(
       flex: 1,
-      fit: FlexFit.loose,
+      fit: FlexFit.tight,
       child: Container(
         padding: EdgeInsets.all(3.0),
         margin: EdgeInsets.all(5.0),
@@ -593,14 +513,19 @@ class CustomLabelledTextView extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(
-                  text,
-                  style: GoogleFonts.ubuntu(
-                    color: Colors.grey[800],
-                    fontSize: 22,
-                    letterSpacing: 1.5,
-                    wordSpacing: 1.0,
-                    fontWeight: FontWeight.normal,
+                Flexible(
+                  flex: 1,
+                  child: Text(
+                    text,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: GoogleFonts.ubuntu(
+                      color: Colors.grey[800],
+                      fontSize: 22,
+                      letterSpacing: 1.5,
+                      wordSpacing: 1.0,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
               ],

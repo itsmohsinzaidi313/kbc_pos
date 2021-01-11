@@ -66,8 +66,13 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
           tableNo: tableNo.valid ? tableNo : TableNo.pure(event.tableNo),
           status: Formz.validate([state.waiter, tableNo]));
     } else if (event is SelectedMember) {
-      _selectedMembersList.add(event.member);
-      yield state.copyWith(selectedMember: _selectedMembersList);
+      if(!_selectedMembersList.contains(event.member)){
+        _selectedMembersList.add(event.member);
+        yield state.copyWith(selectedMember: _selectedMembersList);
+      }
+     else{
+        yield state.copyWith(error: 'Member Already Exist');
+      }
     } else if(event is ByCodeChanged){
       yield state.copyWith(byCode: event.byCode, radioGroupValue: event.byCode);
     } else if(event is ByNameChanged){
@@ -80,7 +85,11 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
         yield state.copyWith(error: e.toString());
         print(e.toString());
       }
+    } else if(event is RemoveMember){
+      _selectedMembersList.remove(event.member);
+      yield state.copyWith(selectedMember: _selectedMembersList);
     } else if (event is OrderSubmitted) {
+      yield state.copyWith(order: event.order);
       final waiter = Waiter.dirty(state.waiter.value);
       final tableNo = TableNo.dirty(state.tableNo.value);
       yield state.copyWith(
