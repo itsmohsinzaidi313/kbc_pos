@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:formz/formz.dart';
 import 'package:kbc_pos/models/model_order_info/table_no.dart';
@@ -7,7 +8,7 @@ import 'package:kbc_pos/models/objects/member.dart';
 import 'package:kbc_pos/models/objects/order.dart';
 import 'package:kbc_pos/models/objects/session.dart';
 
-class MyOrderInfoStates {
+class MyOrderInfoStates{
   final List<Member> membersList;
   final List<DropdownMenuItem<Location>> locationList;
   final List<DropdownMenuItem<Session>> sessionList;
@@ -90,6 +91,9 @@ class MyOrderInfoStates {
       order: order ?? this.order
     );
   }
+
 }
+
+class MyOrderInfoStateInit extends MyOrderInfoStates{}
 
 class FetchingListInProgress extends MyOrderInfoStates {}

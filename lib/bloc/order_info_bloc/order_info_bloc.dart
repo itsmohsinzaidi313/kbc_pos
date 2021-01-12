@@ -89,13 +89,13 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
       _selectedMembersList.remove(event.member);
       yield state.copyWith(selectedMember: _selectedMembersList);
     } else if (event is OrderSubmitted) {
-      yield state.copyWith(order: event.order);
       final waiter = Waiter.dirty(state.waiter.value);
       final tableNo = TableNo.dirty(state.tableNo.value);
       yield state.copyWith(
         waiter: waiter,
         tableNo: tableNo,
-        status: Formz.validate([waiter, tableNo]),
+        order: event.order,
+        status: Formz.validate([waiter, tableNo],),
       );
 
       if (state.status.isValidated) {
@@ -107,10 +107,12 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
               ), () async {
             await orderInfoRepo.insertOrderInfo();
           });
-          yield state.copyWith(status: FormzStatus.submissionSuccess);
+          final newState = state.copyWith(status: FormzStatus.submissionSuccess);
+          yield newState;
         } catch (e) {
-          yield state.copyWith(
+          final newSate = state.copyWith(
               status: FormzStatus.submissionFailure, error: e.toString());
+          yield newSate;
         }
       }
     }

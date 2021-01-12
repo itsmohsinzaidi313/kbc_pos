@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:kbc_pos/models/generic/response_detail.dart';
 import 'package:kbc_pos/models/objects/category.dart';
 import 'package:kbc_pos/models/objects/item.dart';
 import 'package:kbc_pos/shared/config.dart';
@@ -9,6 +10,7 @@ abstract class PosRepo{
 
   Future<List<Category>> getCategories();
   Future<List<Item>> getItemsById({ @required String id});
+  Future<ResponseDetail> sendOrder(Map<String, dynamic> map);
 }
 
 class PosService extends PosRepo{
@@ -40,6 +42,27 @@ class PosService extends PosRepo{
       throw Exception(decodedJson['Message']);
     }
     return _items;
+  }
+
+  @override
+  Future<ResponseDetail> sendOrder(Map<String, dynamic> map) async{
+    Map<String, dynamic> mMap = {'' : map};
+    String mMapJson = jsonEncode(mMap);
+    String url = Config.sendOrderAPI;
+    final response = await http.post(url,
+        headers: {'Content-type' : 'application/json'},
+      body: mMapJson
+    );
+    print(response.body);
+    // Map responseMap;
+    // responseMap = jsonDecode(response.body);
+    // responseMap.forEach((key, value) {print('$key : $value');});
+    //
+    // if(response.statusCode == 200){
+    //   return ResponseDetail(status: true, message: response.reasonPhrase);
+    // }
+    return ResponseDetail(status: false, message: response.reasonPhrase);
+
   }
 
 

@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:kbc_pos/models/objects/category.dart';
 import 'package:kbc_pos/models/objects/item.dart';
+import 'package:kbc_pos/models/objects/order.dart';
 
 abstract class PosEvent extends Equatable{
 
@@ -49,4 +50,7 @@ class CategoryChanged extends PosEvent{
   CategoryChanged({this.category});
 }
 
-class PosOrderSubmitted extends PosEvent{}
+class PosOrderSubmitted extends PosEvent{
+  final Order order;
+  PosOrderSubmitted({ this.order });
+}

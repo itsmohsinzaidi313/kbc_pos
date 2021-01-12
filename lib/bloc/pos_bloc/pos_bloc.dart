@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kbc_pos/bloc/pos_bloc/pos_events.dart';
 import 'package:kbc_pos/bloc/pos_bloc/pos_states.dart';
 import 'package:kbc_pos/data_provider/pos_repo/pos_service.dart';
+import 'package:kbc_pos/models/generic/response_detail.dart';
 import 'package:kbc_pos/models/objects/category.dart';
 import 'package:kbc_pos/models/objects/item.dart';
+import 'package:kbc_pos/models/objects/order.dart';
 
 class PosBloc extends Bloc<PosEvent, MyPosStates>{
 
@@ -52,6 +54,15 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
       // x.quantity = x.quantity -1;
       _cartList.removeAt(event.index);
       yield state.copyWith(cartItemsList: _cartList);
+    } else if (event is PosOrderSubmitted){
+      Order order = event.order;
+      Order order2 = Order(item: state.cartItemsList, member: order.member, orderNo: order.orderNo,
+          cover: order.cover, session: order.session, slip: order.slip, table: order.table, venue: order.venue, waiter: order.waiter);
+      print(order2.toJson().toString());
+      yield state.copyWith(states: PosStates.inProgress, categoriesList: state.categoriesList, cartItemsList: state.cartItemsList, itemsList: state.itemsList);
+      ResponseDetail responseDetail = await posRepo.sendOrder(order2.toJson());
+      if(responseDetail.status) yield state.copyWith(states: PosStates.successful);
+      yield state.copyWith(states: PosStates.successful, categoriesList: state.categoriesList, cartItemsList: state.cartItemsList, itemsList: state.itemsList);
     }
   }
 

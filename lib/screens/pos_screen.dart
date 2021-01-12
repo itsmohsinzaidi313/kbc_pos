@@ -13,6 +13,7 @@ import 'package:kbc_pos/bloc/pos_bloc/pos_states.dart';
 import 'package:kbc_pos/models/objects/category.dart';
 import 'package:kbc_pos/models/objects/item.dart';
 import 'package:kbc_pos/models/objects/member.dart';
+import 'package:kbc_pos/models/objects/order.dart';
 import 'package:kbc_pos/screens/custom_widget_classes/custom_circular_progress_indicator.dart';
 import 'package:kbc_pos/shared/app_theme.dart';
 import 'package:kbc_pos/shared/config.dart';
@@ -32,6 +33,7 @@ class _PosScreenState extends State<PosScreen> {
   String radioGroupValue = 'By Code';
   final TextEditingController _autoCompleteController = TextEditingController();
   OrderInfoBloc _myOrderInfoBloc;
+  Order _order;
 
   @override
   void initState() {
@@ -39,7 +41,8 @@ class _PosScreenState extends State<PosScreen> {
     super.initState();
     context.read<PosBloc>().add(FetchAllLists());
     _myOrderInfoBloc = BlocProvider.of<OrderInfoBloc>(context);
-    print(_myOrderInfoBloc.state.order.toString());
+    // _order = _myOrderInfoBloc.state.order;
+    // print(_order.toString());
   }
 
   @override
@@ -64,9 +67,9 @@ class _PosScreenState extends State<PosScreen> {
             AppTheme.mySnackBar(context: context, msg: states.error);
             print(states.error);
           }
-          /*else if (states.states == PosStates.inProgress) {
-            AppTheme.mySnackBar(context: context, msg: 'Loading...');
-          }*/
+          else if (states.states == PosStates.inProgress) {
+            AppTheme.mySnackBar(context: context, msg: 'Progressing...');
+          }
         },
         child: SingleChildScrollView(
           child: Container(
@@ -592,14 +595,19 @@ class _PosScreenState extends State<PosScreen> {
   }
 */
 
-  Widget _floatingActionButton({Function onPressed}) {
-    return FloatingActionButton(
-      onPressed: onPressed,
-      backgroundColor: AppTheme.appBarColor,
-      tooltip: 'Order Submission',
-      child: Icon(
-        Icons.add,
-        color: Colors.white,
+  Widget _floatingActionButton() {
+    return BlocProvider<OrderInfoBloc>.value(
+      value: _myOrderInfoBloc,
+      child: FloatingActionButton(
+        onPressed: (){
+          context.read<PosBloc>().add(PosOrderSubmitted(order: _myOrderInfoBloc.state.order));
+        },
+        backgroundColor: AppTheme.appBarColor,
+        tooltip: 'Order Submission',
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
     );
   }
@@ -886,7 +894,9 @@ class CartItemList extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 8,),
+                        SizedBox(
+                          height: 8,
+                        ),
                         Text(
                           ' ${double.parse(state.cartItemsList[index - 1].price).toInt().toString()} x ${state.cartItemsList[index - 1].quantity} '
                           '= ${(double.parse(state.cartItemsList[index - 1].price).toInt() * state.cartItemsList[index - 1].quantity).toString()}',

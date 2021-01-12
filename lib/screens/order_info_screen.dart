@@ -30,10 +30,12 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   final _waiterFocusNode = FocusNode();
   final _tableNoFocusNode = FocusNode();
   bool isProgressing = false;
+  dynamic read;
 
   @override
   void initState() {
     super.initState();
+    read =  context.read<OrderInfoBloc>();
     context.read<OrderInfoBloc>().add(FetchingLists());
     _waiterFocusNode.addListener(() {
       if (!_waiterFocusNode.hasFocus) {
@@ -66,8 +68,8 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
             CircularProgressIndicator();
             // AppTheme.mySnackBar(context: context, msg: 'Please Wait..');
           } else if (state.status.isSubmissionSuccess) {
-            // AppTheme.mySnackBar(
-            //     context: context, msg: 'Order Submitted Successfully..');
+            AppTheme.mySnackBar(
+                context: context, msg: 'Order Submitted Successfully..');
             Navigator.pushNamed(context, '/posScreen');
           }
         },
@@ -258,8 +260,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                 value: 'By Code',
                 groupValue: state.radioGroupValue,
                 onChanged: (value) {
-                  context
-                      .read<OrderInfoBloc>()
+                  read
                       .add(ByCodeChanged(byCode: value));
                 },
               ),
@@ -279,8 +280,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                 value: 'By Name',
                 groupValue: state.radioGroupValue,
                 onChanged: (value) {
-                  context
-                      .read<OrderInfoBloc>()
+                  read
                       .add(ByNameChanged(byName: value));
                 },
               ),
@@ -324,13 +324,13 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
             setState(() => isProgressing = true);
             if (_debounce?.isActive ?? false) _debounce.cancel();
             _debounce = Timer(const Duration(seconds: 2), () {
-              context.read<OrderInfoBloc>().add(SearchTextChanged(text: query));
+              read.add(SearchTextChanged(text: query));
             });
           }
         },
         onSubmitted: (query) {
           setState(() => isProgressing = false);
-          context.read<OrderInfoBloc>().add(SearchTextChanged(text: query));
+          read.add(SearchTextChanged(text: query));
         },
         onFocusChanged: (value) {
           if (value) setState(() => isProgressing = !isProgressing);
@@ -345,8 +345,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                 color: Colors.blueGrey,
               ),
               onPressed: () {
-                context
-                    .read<OrderInfoBloc>()
+                read
                     .add(SearchTextChanged(text: controller.query));
               },
             ),
@@ -374,7 +373,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                     onTap: () {
                       setState(() => isProgressing = false);
                       controller.close();
-                      context.read<OrderInfoBloc>().add(
+                      read.add(
                           SelectedMember(member: state.membersList[index]));
                     },
                   );
@@ -464,7 +463,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                   trailing: IconButton(
                     icon: Icon(Icons.delete, color: Colors.red,),
                     onPressed: () {
-                      context.read<OrderInfoBloc>().add(
+                      read.add(
                           RemoveMember(member: state.selectedMember[index]));
                     },
                   ),

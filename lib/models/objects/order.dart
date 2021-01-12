@@ -3,12 +3,34 @@ import 'package:kbc_pos/models/objects/member.dart';
 
 class Order {
 
+  static final String orderItemsList = 'orderItemsList';
+  static final String orderMembersList = 'orderMembersList';
+  static final String orderOrderNo = 'orderOrderNo';
+  static final String orderCover = 'orderCover';
+  static final String orderSlip = 'orderSlip';
+  static final String orderVenue = 'orderVenue';
+  static final String orderSession = 'orderSession';
+  static final String orderWaiter = 'orderWaiter';
+  static final String orderTable = 'orderTable';
+
   final List<Item> item;
   final List<Member> member;
   final String orderNo, cover, slip, venue, session, waiter, table;
 
   const Order({ this.item, this.member, this.orderNo, this.cover, this.slip,
     this.venue, this.session, this.waiter, this.table });
+
+  Map<String, dynamic> toJson() => {
+    orderItemsList : item.map((e) => e.toJson()).toList(),
+    orderMembersList : member.map((e) => e.toJson()).toList(),
+    orderOrderNo : orderNo,
+    orderCover : cover,
+    orderSlip : slip,
+    orderVenue : venue,
+    orderSession : session,
+    orderWaiter : waiter,
+    orderTable :  table
+  };
 
   @override
   String toString() {
