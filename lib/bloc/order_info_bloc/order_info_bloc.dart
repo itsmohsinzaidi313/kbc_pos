@@ -99,22 +99,9 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
       );
 
       if (state.status.isValidated) {
-        try {
-          yield state.copyWith(status: FormzStatus.submissionInProgress);
-          await Future<void>.delayed(
-              Duration(
-                seconds: 1,
-              ), () async {
-            await orderInfoRepo.insertOrderInfo();
-          });
-          final newState = state.copyWith(status: FormzStatus.submissionSuccess);
-          yield newState;
-        } catch (e) {
-          final newSate = state.copyWith(
-              status: FormzStatus.submissionFailure, error: e.toString());
-          yield newSate;
-        }
+        yield state.copyWith(status: FormzStatus.submissionSuccess);
       }
+
     }
   }
 

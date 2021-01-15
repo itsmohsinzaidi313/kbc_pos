@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_bloc.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_events.dart';
@@ -10,6 +11,8 @@ import 'package:kbc_pos/bloc/order_info_bloc/order_info_states.dart';
 import 'package:kbc_pos/bloc/pos_bloc/pos_bloc.dart';
 import 'package:kbc_pos/bloc/pos_bloc/pos_events.dart';
 import 'package:kbc_pos/bloc/pos_bloc/pos_states.dart';
+import 'package:kbc_pos/data_provider/order_info_repo/order_info_service.dart';
+import 'package:kbc_pos/data_provider/pos_repo/pos_service.dart';
 import 'package:kbc_pos/models/objects/category.dart';
 import 'package:kbc_pos/models/objects/item.dart';
 import 'package:kbc_pos/models/objects/member.dart';
@@ -32,24 +35,13 @@ class _PosScreenState extends State<PosScreen> {
 
   String radioGroupValue = 'By Code';
   final TextEditingController _autoCompleteController = TextEditingController();
-  OrderInfoBloc _myOrderInfoBloc;
-  Order _order;
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     context.read<PosBloc>().add(FetchAllLists());
-    _myOrderInfoBloc = BlocProvider.of<OrderInfoBloc>(context);
-    // _order = _myOrderInfoBloc.state.order;
-    // print(_order.toString());
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    _myOrderInfoBloc.close();
   }
 
   @override
@@ -65,7 +57,6 @@ class _PosScreenState extends State<PosScreen> {
                 context: context, msg: 'List Fetched Successfully..');
           } else if (states.states == PosStates.failed) {
             AppTheme.mySnackBar(context: context, msg: states.error);
-            print(states.error);
           }
           else if (states.states == PosStates.inProgress) {
             AppTheme.mySnackBar(context: context, msg: 'Progressing...');
@@ -80,7 +71,7 @@ class _PosScreenState extends State<PosScreen> {
                 CustomAppBar(
                   appBarTitle: 'POS Screen',
                   searchBar: autoCompleteSearchBar(),
-                  radioButtons: searchRadioButton(),
+                  radioButtons: SizedBox(),
                   onBackPressed: () => Navigator.pop(context),
                 ),
                 Flexible(
@@ -183,117 +174,65 @@ class _PosScreenState extends State<PosScreen> {
   }
 
   Widget autoCompleteSearchBar() {
-    return FutureBuilder(
-      builder: (context, snapshot) {
-        if (snapshot.hasData == null &&
-            snapshot.connectionState == ConnectionState.none) {
-          return Container(
-            child: Center(
-              child: Text('Progressing..'),
-            ),
-          );
-        } else if (snapshot.hasError) {
-          print(snapshot.error);
-        } else if (snapshot.hasData) {
-          return AutoCompleteTextField<Member>(
-            clearOnSubmit: false,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-            ),
-            decoration: InputDecoration(
-              hintText: 'Search Item Here..',
-              border: InputBorder.none,
-              suffixIcon: IconButton(
-                icon: Icon(Icons.cancel),
-                iconSize: 20,
-                color: Colors.yellow[700],
-                onPressed: () {
-                  _autoCompleteController.text = "";
-                },
-              ),
-              contentPadding: EdgeInsets.fromLTRB(10, 30, 10, 20),
-              hintStyle: TextStyle(color: Colors.grey),
-            ),
-            keyboardType: TextInputType.text,
-            controller: _autoCompleteController,
-            textChanged: (value) {
-              print(value);
+    return TypeAheadField(
+      getImmediateSuggestions: true,
+      textFieldConfiguration: TextFieldConfiguration(
+        controller: _autoCompleteController,
+        autofocus: false,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: 'Search an Item..',
+          prefixIcon:  Icon(Icons.search_sharp, color: Colors.grey,),
+          suffixIcon: IconButton(
+            icon: Icon(Icons.clear_rounded),
+            onPressed: (){
+              this._autoCompleteController.text = "";
             },
-            itemSubmitted: (item) async {
-              _autoCompleteController.text = radioGroupValue == 'By Code'
-                  ? item.memberNo
-                  : item.memberName;
-              BlocProvider.of<OrderInfoBloc>(context)
-                  .add(SelectedMember(member: item));
-            },
-            key: _tKey,
-            suggestions: snapshot.data,
-            itemBuilder: (context, item) {
-              return radioGroupValue == 'By Code'
-                  ? autoCompleteSearchBarRow(
-                      item: item.memberNo, icon: Icon(Icons.person))
-                  : autoCompleteSearchBarRow(
-                      item: item.memberName, icon: Icon(Icons.person));
-              // return autoCompleteSearchBarRow(
-              //     item: item.memberNo, icon: Icon(Icons.person));
-            },
-            itemFilter: (item, query) {
-              bool _itemFilter;
-              if (_autoCompleteController.text.isNotEmpty) {
-                _itemFilter = radioGroupValue == 'By Code'
-                    ? item.memberNo
-                        .toLowerCase()
-                        .startsWith(query.toLowerCase())
-                    : item.memberName
-                        .toLowerCase()
-                        .startsWith(query.toLowerCase());
-              } else {
-                _autoCompleteController.text = '';
-                _itemFilter = false;
-              }
-              return _itemFilter;
-              // return item.memberNo.toLowerCase().startsWith(query.toLowerCase());
-            },
-            itemSorter: (a, b) {
-              return radioGroupValue == 'By Code'
-                  ? a.memberNo.compareTo(b.memberNo.toLowerCase())
-                  : a.memberName.compareTo(b.memberName.toLowerCase());
-              // return a.memberNo.compareTo(b.memberNo.toLowerCase());
-            },
-          );
-        }
-        return Container();
+          ),
+        ),
+      ),
+      suggestionsCallback: (pattern) async{
+        return await getItems(pattern);
       },
-      future: getMembers(),
+      suggestionsBoxDecoration: SuggestionsBoxDecoration(
+
+      ),
+
+      itemBuilder: (BuildContext context, Item suggestion) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListTile(
+            title: Text(suggestion.name),
+            subtitle: Text(
+              'PKR: ${suggestion.price}/=',
+            ),
+          ),
+        );
+      },
+      keepSuggestionsOnLoading: false,
+      hideOnLoading: true,
+      hideOnEmpty: false,
+      noItemsFoundBuilder: (context){
+        if(_autoCompleteController.text.isNotEmpty){
+          return ListTile(
+            title: Text('No Item Found!'),
+          );
+        } else {
+          return null;
+        }
+      },
+      hideOnError: true,
+      onSuggestionSelected: (Item suggestion) {
+        this._autoCompleteController.text = suggestion.name;
+        context.read<PosBloc>().add(AddCartItem(item: suggestion));
+      },
     );
   }
 
-  Future<List<Member>> getMembers() async {
-    List<Member> list;
-    await Future.delayed(Duration(seconds: 1), () {
-      list = [
-        Member(
-            memberId: 1,
-            memberNo: '1220',
-            memberType: 'PL',
-            memberStatus: 'E',
-            memberName: 'MR. C. G. KHARAS'),
-        Member(
-            memberId: 1,
-            memberNo: '1856',
-            memberType: 'PO',
-            memberStatus: 'R',
-            memberName: 'MR. USMAN AMINUDDIN'),
-        Member(
-            memberId: 1,
-            memberNo: '2651',
-            memberType: 'PE',
-            memberStatus: 'E',
-            memberName: 'MR. SALEENM A. THARIANI'),
-      ];
-    });
-    return list;
+  Future<List<Item>> getItems(String searchText) async {
+    List<Item> list = await PosService.searchingItem(text: searchText);
+    if(list != null) return list;
+    else return null;
   }
 
   Widget autoCompleteSearchBarRow(
@@ -331,11 +270,6 @@ class _PosScreenState extends State<PosScreen> {
   List<Widget> getCategoryWidgets(List<Category> lstCategory) {
     List<Widget> widgets = [];
     lstCategory.forEach((category) {
-      // if(_element.isEmpty){
-      //   setState(() {
-      //     _element = category.categoryName;
-      //   });
-      // }
       widgets.add(
         Card(
           elevation: 2,
@@ -394,221 +328,22 @@ class _PosScreenState extends State<PosScreen> {
     return widgets;
   }
 
-  List<Widget> getItemsWidgets(List<dynamic> lstItem, String categoryName) {
-/*    List<Widget> widgets = [];
-    lstItem.forEach((item) {
-      // if (categoryName.isEmpty) {
-      //   categoryName = item.categoryName;
-      // }
-      if (item.categoryName == _element) {
-        widgets.add(
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            elevation: 3,
-            color: Colors.white,
-            child: InkWell(
-              onTap: () {
-                setState(() {
-                  this.model.order.addItem(item);
-                });
-              },
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    child: Container(
-                      height: Config.getDeviceHeight(context) * 0.2,
-                      width: Config.getDeviceWidth(context) * 0.159,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
-                        ),
-                        image: DecorationImage(
-                          image: item.photo != null
-                              ? NetworkImage(item.photo)
-                              : AssetImage('assets/no_image1.jpg'),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ),
-                  item.photo == null
-                      ? Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            'No Image'.toUpperCase(),
-                            style: GoogleFonts.anton(
-                              color: Colors.white70,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        )
-                      : Container(),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    child: Container(
-                      padding: EdgeInsets.all(8),
-                      height: Config.getDeviceHeight(context) * 0.094,
-                      width: Config.getDeviceWidth(context) * 0.158,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(10),
-                          bottomRight: Radius.circular(10),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  item.name.toUpperCase(),
-                                  textAlign: TextAlign.left,
-                                  style: GoogleFonts.ubuntuCondensed(
-                                    color: Colors.grey.shade800,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0,
-                                    wordSpacing: 0.5,
-                                  ),
-                                ),
-                              ),
-                              Column(
-                                // mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    'PKR ${double.parse(item.salePrice).toInt().toString()}',
-                                    style: GoogleFonts.ubuntuCondensed(
-                                      color: Colors.grey.shade500,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      wordSpacing: 1.0,
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.star,
-                                        size: 10,
-                                        color: Colors.yellow.shade900,
-                                      ),
-                                      Icon(
-                                        Icons.star,
-                                        size: 10,
-                                        color: Colors.yellow.shade900,
-                                      ),
-                                      Icon(
-                                        Icons.star_half_outlined,
-                                        size: 10,
-                                        color: Colors.yellow.shade900,
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      }
-    });
-    return widgets;*/
-    return [];
-  }
-
-/*
-  List<Widget> getCartItemsWidgets(List<dynamic> lstItem) {
-    List<Widget> widgets = [];
-    lstItem.forEach((item) {
-      widgets.add(
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              model.order.addItem(item);
-            });
-          },
-          child: Card(
-            elevation: 4,
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.yellow.shade700,
-                radius: 16,
-                child: CircleAvatar(
-                  radius: 14,
-                  backgroundImage: item.photo != null ? NetworkImage(item.photo) : AssetImage('assets/no_image1.jpg'),
-                ),
-              ),
-              title: Text(
-                  item.name.toUpperCase(),
-                style: GoogleFonts.ubuntuCondensed(
-                  color: Colors.black87,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                  wordSpacing: 0.5,
-                ),
-              ),
-              subtitle: Text(
-                ' ${double.parse(item.salePrice).toInt().toString()} x ${item.quantity} '
-                    '= ${(double.parse(item.salePrice).toInt() * int.parse(item.quantity)).toString()}',
-                style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontSize: 10,
-                ),
-              ),
-              trailing: IconButton(
-                icon: Icon(
-                  Icons.delete_outline_rounded,
-                  color: Colors.yellow.shade800,
-                  size: 20,
-                ),
-                onPressed: () {
-                  setState(() {
-                    item.quantity = 1.toString();
-                    this.model.order.removeItem(item);
-                  });
-                },
-              ),
-            ),
-          ),
-        ),
-      );
-    });
-    return widgets;
-  }
-*/
 
   Widget _floatingActionButton() {
-    return BlocProvider<OrderInfoBloc>.value(
-      value: _myOrderInfoBloc,
-      child: FloatingActionButton(
-        onPressed: (){
-          context.read<PosBloc>().add(PosOrderSubmitted(order: _myOrderInfoBloc.state.order));
-        },
-        backgroundColor: AppTheme.appBarColor,
-        tooltip: 'Order Submission',
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-      ),
+    return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+      builder: (context, state){
+        return FloatingActionButton(
+          onPressed: (){
+            context.read<PosBloc>().add(PosOrderSubmitted(order: state.order));
+          },
+          backgroundColor: AppTheme.appBarColor,
+          tooltip: 'Order Submission',
+          child: Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
+        );
+      },
     );
   }
 }
@@ -622,6 +357,7 @@ class ItemList extends StatelessWidget {
       builder: (context, states) {
         if (states.states == PosStates.itemListLoaded ||
             states.states == PosStates.successful ||
+            states.states == PosStates.inProgress ||
             states.states == PosStates.init) {
           return Flexible(
             flex: 1,
@@ -772,6 +508,7 @@ class CategoryList extends StatelessWidget {
       builder: (context, states) {
         if (states.states == PosStates.categoryListLoaded ||
             states.states == PosStates.successful ||
+            states.states == PosStates.inProgress ||
             states.states == PosStates.init) {
           return Flexible(
             flex: 1,

@@ -52,7 +52,10 @@ void main() {
           '/loginScreen': (context) => LoginScreen(),
           '/dashboardScreen': (context) => DashboardScreen(),
           '/orderInfoScreen': (context) => OrderInfoScreen(),
-          '/posScreen': (context) => PosScreen(),
+          '/posScreen': (context) => BlocProvider.value(
+                value: BlocProvider.of<OrderInfoBloc>(context),
+                child: PosScreen(),
+              ),
           '/settingScreen': (context) => SettingsScreen(),
         },
         theme: ThemeData(

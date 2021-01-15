@@ -1,7 +1,7 @@
-
 import 'dart:convert';
+import 'package:equatable/equatable.dart';
 
-class Member{
+class Member extends Equatable{
 
   static final String mCode = 'MemberCode';
   static final String mStatus = 'Status';
@@ -37,6 +37,9 @@ class Member{
   String toString() {
     return 'Member{memberId: $memberId, memberNo: $memberNo, memberType: $memberType, memberStatus: $memberStatus, memberName: $memberName, memberElectDate: $memberElectDate, memberBirthDate: $memberBirthDate}';
   }
+
+  @override
+  List<Object> get props => [memberId, memberNo, memberType, memberStatus, memberName, memberElectDate, memberBirthDate];
 }
 
 List<Member> memberListFromJson(String str) => List<Member>.from(json.decode(str)['Data'].map((x) => Member.fromJson(x)));

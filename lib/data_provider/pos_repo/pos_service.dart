@@ -48,6 +48,7 @@ class PosService extends PosRepo{
   Future<ResponseDetail> sendOrder(Map<String, dynamic> map) async{
     Map<String, dynamic> mMap = {'' : map};
     String mMapJson = jsonEncode(mMap);
+    print(mMapJson);
     String url = Config.sendOrderAPI;
     final response = await http.post(url,
         headers: {'Content-type' : 'application/json'},
@@ -58,12 +59,29 @@ class PosService extends PosRepo{
     // responseMap = jsonDecode(response.body);
     // responseMap.forEach((key, value) {print('$key : $value');});
     //
-    // if(response.statusCode == 200){
-    //   return ResponseDetail(status: true, message: response.reasonPhrase);
-    // }
+    if(response.statusCode == 200){
+      print(response.body);
+      return ResponseDetail(status: true, message: response.reasonPhrase);
+    }
     return ResponseDetail(status: false, message: response.reasonPhrase);
 
   }
 
+  static Future<List<Item>> searchingItem({String text}) async{
+    List<Item> list;
+    try {
+      String url = '${Config.searchItemAPI}$text';
+      final response = await http.get(url);
+      print(response.body);
+      if(response.statusCode == 200){
+        list = itemListFromJson(jsonDecode(response.body));
+      }else{
+        throw Exception(response.reasonPhrase);
+      }
+    } catch (e) {
+      print(e);
+    }
+    return list;
+  }
 
 }

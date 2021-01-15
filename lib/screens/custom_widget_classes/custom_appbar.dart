@@ -18,7 +18,7 @@ class CustomAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: Config.getDeviceHeight(context) * 0.25,
+      height: Config.getDeviceHeight(context) * 0.28,
       child: Stack(
         children: [
           Container(
@@ -49,14 +49,14 @@ class CustomAppBar extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 40,
+            top: 45,
             left: 0,
             right: 0,
             child: Container(
               margin: EdgeInsets.all(16),
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Colors.grey[200],
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(5.0),
                 border: Border.all(
@@ -64,6 +64,20 @@ class CustomAppBar extends StatelessWidget {
                   width: 2,
                   style: BorderStyle.solid,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white,
+                    offset: Offset(-3,-3),
+                    blurRadius: 1,
+                    spreadRadius: 0.5,
+                  ),
+                  BoxShadow(
+                    color: Colors.grey,
+                    offset: Offset(3,3),
+                    blurRadius: 5,
+                    spreadRadius: 0.5,
+                  ),
+                ],
               ),
               child: Row(
                 children: [
@@ -75,10 +89,10 @@ class CustomAppBar extends StatelessWidget {
                       child: searchBar,
                     ),
                   ),
-                  Expanded(
+                  /*Expanded(
                     flex: 1,
                     child: radioButtons,
-                  ),
+                  ),*/
                 ],
               ),
             ),

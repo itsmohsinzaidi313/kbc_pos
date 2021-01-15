@@ -1,6 +1,8 @@
 import 'dart:convert';
 
-class Item{
+import 'package:equatable/equatable.dart';
+
+class Item extends Equatable{
 
   static final String itemId = 'Id';
   static final String itemCategoryId = 'CategoryId';
@@ -28,6 +30,10 @@ class Item{
     itemPrice : price,
     itemQty : quantity.toString()
   };
+
+  @override
+  // TODO: implement props
+  List<Object> get props => [id, categoryId, name, price, quantity];
 
 
 }

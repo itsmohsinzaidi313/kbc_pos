@@ -5,14 +5,17 @@ import 'package:logger/logger.dart';
 class Config {
 
   //region ___ALL APIS___
-  // static final String ipAddress = "192.168.18.250";
-  static final String ipAddress = "25.64.160.210";
+  static final String ipAddress = "192.168.18.250";
+  // static final String ipAddress = "25.64.160.210";
   static final String commonAPI = "http://$ipAddress/kbc/data";
   static final String key = "?key=123";
   static final String getCategoryAPI = "$commonAPI/getcategories$key";
   static final String getItemsAPI = "$commonAPI/getitems$key&categoryid=";
+  static final String getSessionsAPI = "$commonAPI/getsession$key";
+  static final String getLocationsAPI = "$commonAPI/getlocation$key";
   static String loginUserAPI = "$commonAPI/getuser$key&";
-  static final String getMembersAPI = "$commonAPI/searchmember$key&phrase=";
+  static final String searchMembersAPI = "$commonAPI/searchmember$key&phrase=";
+  static final String searchItemAPI = "$commonAPI/searchitems$key&phrase=";
   static final String sendOrderAPI = "$commonAPI/neworder$key";
 
   setLoginUserAPI(String username, String password){

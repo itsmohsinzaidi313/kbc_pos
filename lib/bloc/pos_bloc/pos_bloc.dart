@@ -35,8 +35,9 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
         yield state.copyWith(error: e.toString(), states: PosStates.failed);
       }
     } else if (event is AddCartItem){
-      if(!_cartList.contains(event.item)){
-        _cartList.add(event.item);
+      Item item = event.item;
+      if(!_cartList.contains(item)){
+        _cartList.add(item);
         yield state.copyWith(cartItemsList:_cartList);
       }
     } else if (event is PlusCartItem){
@@ -58,11 +59,9 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
       Order order = event.order;
       Order order2 = Order(item: state.cartItemsList, member: order.member, orderNo: order.orderNo,
           cover: order.cover, session: order.session, slip: order.slip, table: order.table, venue: order.venue, waiter: order.waiter);
-      print(order2.toJson().toString());
-      yield state.copyWith(states: PosStates.inProgress, categoriesList: state.categoriesList, cartItemsList: state.cartItemsList, itemsList: state.itemsList);
+      yield state.copyWith(states: PosStates.inProgress,/* categoriesList: state.categoriesList, cartItemsList: state.cartItemsList, itemsList: state.itemsList*/);
       ResponseDetail responseDetail = await posRepo.sendOrder(order2.toJson());
       if(responseDetail.status) yield state.copyWith(states: PosStates.successful);
-      yield state.copyWith(states: PosStates.successful, categoriesList: state.categoriesList, cartItemsList: state.cartItemsList, itemsList: state.itemsList);
     }
   }
 

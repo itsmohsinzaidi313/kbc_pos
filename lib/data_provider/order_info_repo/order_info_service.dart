@@ -20,7 +20,7 @@ class OrderInfoService extends OrderInfoRepo{
   Future<List<Member>> getMembers(String query) async{
     List<Member> list;
     try {
-      String url = '${Config.getMembersAPI}$query';
+      String url = '${Config.searchMembersAPI}$query';
       final response = await http.get(url);
       print(response.body);
       if(response.statusCode == 200){
@@ -68,6 +68,23 @@ class OrderInfoService extends OrderInfoRepo{
       isInserted = true;
     });
     return isInserted;
+  }
+
+  static Future<List<Member>> searchingMember({String text}) async{
+    List<Member> list;
+    try {
+      String url = '${Config.searchMembersAPI}$text';
+      final response = await http.get(url);
+      print(response.body);
+      if(response.statusCode == 200){
+        list = memberListFromJson(jsonDecode(response.body));
+      }else{
+        throw Exception(response.reasonPhrase);
+      }
+    } catch (e) {
+      print(e);
+    }
+    return list;
   }
 }
 

@@ -4,10 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_bloc.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_events.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_states.dart';
+import 'package:kbc_pos/data_provider/order_info_repo/order_info_service.dart';
 import 'package:kbc_pos/models/objects/location.dart';
 import 'package:kbc_pos/models/objects/member.dart';
 import 'package:kbc_pos/models/objects/order.dart';
@@ -16,6 +18,8 @@ import 'package:kbc_pos/shared/app_theme.dart';
 import 'package:kbc_pos/shared/config.dart';
 import 'package:formz/formz.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
+
+import 'custom_widget_classes/custom_appbar.dart';
 
 class OrderInfoScreen extends StatefulWidget {
   @override
@@ -53,10 +57,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Order Info'),
-        backgroundColor: Colors.red,
-      ),
+      key: _key,
       body: BlocListener<OrderInfoBloc, MyOrderInfoStates>(
         listenWhen: (previous, current) => previous != current,
         listener: (context, state) {
@@ -65,141 +66,124 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
           } else if (state.status.isSubmissionFailure) {
             AppTheme.mySnackBar(context: context, msg: state.error);
           } else if (state.status.isSubmissionInProgress) {
-            CircularProgressIndicator();
-            // AppTheme.mySnackBar(context: context, msg: 'Please Wait..');
+            // CircularProgressIndicator();
+            AppTheme.mySnackBar(context: context, msg: 'Please Wait..');
           } else if (state.status.isSubmissionSuccess) {
-            AppTheme.mySnackBar(
-                context: context, msg: 'Order Submitted Successfully..');
             Navigator.pushNamed(context, '/posScreen');
           }
         },
         child: Container(
           width: Config.getDeviceWidth(context),
           height: Config.getDeviceHeight(context),
-          child: Stack(
-            children: [
-              Container(
-                height: Config.getDeviceHeight(context),
-                width: Config.getDeviceWidth(context),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
-                        builder: (context, state) {
-                          return Column(
-                            children: [
-                              SizedBox(
-                                height: Config.getDeviceHeight(context) * 0.13,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  seeMultipleMembers(
-                                      context: context,
-                                      member: state.selectedMember),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  CustomLabelledTextView(
-                                    labelName: 'Member Name',
-                                    text: state.selectedMember.length > 0
-                                        ? state.selectedMember.last?.memberName
-                                        : '...',
-                                    // text: state.selectedMember[0].memberName ?? '...',
-                                  ),
-                                  CustomLabelledTextView(
-                                    labelName: 'Member Code',
-                                    text: state.selectedMember.length > 0
-                                        ? state.selectedMember.last?.memberNo
-                                        : '...',
-                                    // text: state.selectedMember[0].memberNo ?? '...',
-                                  ),
-                                  CustomLabelledTextView(
-                                    labelName: 'Member Status',
-                                    text: state.selectedMember.length > 0
-                                        ? state
-                                            .selectedMember.last?.memberStatus
-                                        : '...',
-                                    // text: state.selectedMember[0].memberStatus ?? '...',
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  CustomLabelledTextView(
-                                    labelName: 'Order No.',
-                                    text: '...',
-                                  ),
-                                  CustomLabelledTextView(
-                                    labelName: 'Covers',
-                                    text: '...',
-                                  ),
-                                  CustomLabelledTextView(
-                                    labelName: 'Slip',
-                                    text: '...',
-                                  ),
-                                ],
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          LocationDropdown(),
-                          SessionDropdown(),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          WaiterInput(
-                            focusNode: _waiterFocusNode,
-                          ),
-                          TableInput(
-                            focusNode: _tableNoFocusNode,
-                          ),
-                        ],
-                      ),
-                      /*Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          AtPartyCheckBox(),
-                          WithSpouseCheckBox(),
-                        ],
-                      ),*/
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                          vertical: 20.0,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+                  builder: (context, state) {
+                    return Column(
+                      children: [
+                        CustomAppBar(
+                          appBarTitle: 'Order Info Screen',
+                          searchBar: autoCompleteSearchBar(),
+                          radioButtons: SizedBox(),
+                          onBackPressed: () => Navigator.pop(context),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            submitButton(),
+                            seeMultipleMembers(
+                                context: context,
+                                member: state.selectedMember),
                           ],
                         ),
-                      ),
+                        Row(
+                          mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomLabelledTextView(
+                              labelName: 'Member Name',
+                              text: state.selectedMember.length > 0
+                                  ? state.selectedMember.last?.memberName
+                                  : '...',
+                              // text: state.selectedMember[0].memberName ?? '...',
+                            ),
+                            CustomLabelledTextView(
+                              labelName: 'Member Code',
+                              text: state.selectedMember.length > 0
+                                  ? state.selectedMember.last?.memberNo
+                                  : '...',
+                              // text: state.selectedMember[0].memberNo ?? '...',
+                            ),
+                            CustomLabelledTextView(
+                              labelName: 'Member Status',
+                              text: state.selectedMember.length > 0
+                                  ? state
+                                      .selectedMember.last?.memberStatus
+                                  : '...',
+                              // text: state.selectedMember[0].memberStatus ?? '...',
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomLabelledTextView(
+                              labelName: 'Order No.',
+                              text: '...',
+                            ),
+                            CustomLabelledTextView(
+                              labelName: 'Covers',
+                              text: '...',
+                            ),
+                            CustomLabelledTextView(
+                              labelName: 'Slip',
+                              text: '...',
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    LocationDropdown(),
+                    SessionDropdown(),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    WaiterInput(
+                      focusNode: _waiterFocusNode,
+                    ),
+                    TableInput(
+                      focusNode: _tableNoFocusNode,
+                    ),
+                  ],
+                ),
+                /*Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    AtPartyCheckBox(),
+                    WithSpouseCheckBox(),
+                  ],
+                ),*/
+                Container(
+                  margin: EdgeInsets.symmetric(
+                    vertical: 20.0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      submitButton(),
                     ],
                   ),
                 ),
-              ),
-              Positioned(
-                top: 10,
-                left: 10,
-                right: 10,
-                child: Container(
-                  height: Config.getDeviceHeight(context),
-                  width: Config.getDeviceWidth(context),
-                  child: autoCompleteSearchBar(),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -300,90 +284,65 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   }
 
   Widget autoCompleteSearchBar() {
-    Timer _debounce;
+    return TypeAheadField(
+      getImmediateSuggestions: true,
+      textFieldConfiguration: TextFieldConfiguration(
+        controller: _autoCompleteController,
+        autofocus: false,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: 'Search a Member..',
+          prefixIcon:  Icon(Icons.search_sharp, color: Colors.grey,),
+          suffixIcon: IconButton(
+            icon: Icon(Icons.clear_rounded),
+            onPressed: (){
+              this._autoCompleteController.text = "";
+            },
+          ),
+        ),
+      ),
+      suggestionsCallback: (pattern) async{
+        return await getMembers(pattern);
+      },
+      suggestionsBoxDecoration: SuggestionsBoxDecoration(
 
-    return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
-        builder: (context, state) {
-      final isPortrait =
-          MediaQuery.of(context).orientation == Orientation.portrait;
+      ),
 
-      return FloatingSearchBar(
-        hint: 'Search...',
-        controller: controller,
-        scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
-        transitionDuration: const Duration(milliseconds: 800),
-        automaticallyImplyBackButton: true,
-        transitionCurve: Curves.easeInOut,
-        physics: const BouncingScrollPhysics(),
-        axisAlignment: isPortrait ? 0.0 : -1.0,
-        openAxisAlignment: 0.0,
-        maxWidth: isPortrait ? 600 : 500,
-        debounceDelay: const Duration(milliseconds: 500),
-        onQueryChanged: (query) {
-          if (query.isNotEmpty) {
-            setState(() => isProgressing = true);
-            if (_debounce?.isActive ?? false) _debounce.cancel();
-            _debounce = Timer(const Duration(seconds: 2), () {
-              read.add(SearchTextChanged(text: query));
-            });
-          }
-        },
-        onSubmitted: (query) {
-          setState(() => isProgressing = false);
-          read.add(SearchTextChanged(text: query));
-        },
-        onFocusChanged: (value) {
-          if (value) setState(() => isProgressing = !isProgressing);
-        },
-        transition: CircularFloatingSearchBarTransition(),
-        actions: [
-          FloatingSearchBarAction(
-            showIfOpened: true,
-            child: CircularButton(
-              icon: Icon(
-                Icons.search,
-                color: Colors.blueGrey,
-              ),
-              onPressed: () {
-                read
-                    .add(SearchTextChanged(text: controller.query));
-              },
+      itemBuilder: (BuildContext context, Member suggestion) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListTile(
+            title: Text(suggestion.memberName),
+            subtitle: Text(
+              'Code: ${suggestion.memberNo}',
             ),
           ),
-          FloatingSearchBarAction.searchToClear(
-            showIfClosed: true,
-          ),
-        ],
-        progress: isProgressing,
-        closeOnBackdropTap: true,
-        isScrollControlled: true,
-        builder: (context, transition) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Material(
-              color: Colors.white,
-              elevation: 4.0,
-              child: ListView.builder(
-                itemCount: state.membersList.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: Icon(Icons.person),
-                    title: Text(state.membersList[index].memberName ?? '...'),
-                    onTap: () {
-                      setState(() => isProgressing = false);
-                      controller.close();
-                      read.add(
-                          SelectedMember(member: state.membersList[index]));
-                    },
-                  );
-                },
-              ),
-            ),
+        );
+      },
+      keepSuggestionsOnLoading: false,
+      hideOnLoading: true,
+      hideOnEmpty: false,
+      noItemsFoundBuilder: (context){
+        if(_autoCompleteController.text.isNotEmpty){
+          return ListTile(
+            title: Text('No Member Found!'),
           );
-        },
-      );
-    });
+        } else {
+          return null;
+        }
+      },
+      hideOnError: true,
+      onSuggestionSelected: (Member suggestion) {
+        this._autoCompleteController.text = suggestion.memberName;
+        context.read<OrderInfoBloc>().add(SelectedMember(member: suggestion));
+      },
+    );
+  }
+
+  Future<List<Member>> getMembers(String searchText) async {
+    List<Member> list = await OrderInfoService.searchingMember(text: searchText);
+    if(list != null) return list;
+    else return null;
   }
 
   Widget autoCompleteSearchBarRow(
