@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:kbc_pos/bloc/order_bloc/order_bloc.dart';
+import 'package:kbc_pos/bloc/order_bloc/order_states.dart';
+import 'package:kbc_pos/models/objects/order.dart';
+import 'package:kbc_pos/screens/custom_widget_classes/custom_circular_progress_indicator.dart';
 import 'package:kbc_pos/shared/app_theme.dart';
 import 'package:kbc_pos/shared/config.dart';
 
@@ -11,119 +16,43 @@ class OrderScreen extends StatefulWidget {
 class _OrderScreenState extends State<OrderScreen> {
   GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
 
-  /// int orderType;
-  ///1 for dine-in
-  ///2 for takeaway  ///3 for delivery
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
-      key: _key,
-      appBar: AppTheme.appBarNormal(
-          appBarTitle: 'New Order',
-          appBarBgColor: AppTheme.appBarColor,
-          appBarElevation: 0.0,
-          context: context),
-      body: Container(
-        height: Config.getDeviceHeight(context),
-        width: Config.getDeviceWidth(context),
+        backgroundColor: Colors.grey[200],
+        key: _key,
+        appBar: AppTheme.appBarNormal(
+            appBarTitle: 'New Order',
+            appBarBgColor: AppTheme.appBarColor,
+            appBarElevation: 0.0,
+            context: context),
+        body: Container(
+          height: Config.getDeviceHeight(context),
+          width: Config.getDeviceWidth(context),
+          child: BlocBuilder<OrderBloc, MyOrderStates>(
+            builder: (context, state) {
+              if (state is MyOrderStateList) {
+                return ListView.builder(
+                  key: _key,
+                  scrollDirection: Axis.vertical,
+                  physics: ClampingScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: state.order.length,
+                  itemBuilder: (context, index) {
+                    return orderListItem(order: state.order[index]);
+                  },
+                );
+              }
+              else if (state is MyOrderStatesError){
 
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: RaisedButton.icon(
-                      onPressed: () {
-                        ///set orderType to 1
-                      },
-                      color: AppTheme.listTextColor,
-                      icon: Icon(
-                        Icons.local_dining,
-                      ),
-                      label: Text('Dine-In'.toUpperCase()),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: RaisedButton.icon(
-                      onPressed: () {
-                        ///set orderType to 2
-                      },
-                      color: AppTheme.listTextColor,
-                      icon: Icon(
-                        Icons.directions_walk,
-                      ),
-                      label: Text('Takeaway'.toUpperCase()),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: RaisedButton.icon(
-                      onPressed: () {
-                        ///set orderType to 3
-                      },
-                      color: AppTheme.listTextColor,
-                      icon: Icon(
-                        Icons.directions_bike,
-                      ),
-                      label: Text('Delivery'.toUpperCase()),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Expanded(
-              flex: 1,
-              child: FutureBuilder(
-                  future: getOrdersList(/*orderType*/ null),
-                  initialData: Container(
-                    child: SpinKitRing(
-                      color: Colors.yellow[800],
-                    ),
-                  ),
-                  builder: (context, snapshot) => snapshot.data),
-            ),
-          ],
-        ),
-      ),
-    );
+              }
+              return CustomCircularProgressIndication();
+            },
+          ),
+        ));
   }
 
-  Future<Widget> getOrdersList(int orderType) async {
-    Widget widget;
-    switch (orderType) {
-      case 1:
-
-        ///get dine-in list
-        break;
-      case 2:
-
-        ///get takeaway list
-        break;
-      case 3:
-
-        ///get delivery list
-        break;
-      default:
-        break;
-    }
-    return widget;
-  }
-
-  Future onOrderCancelled() async {
-    ///function for order cancelling
+  Widget orderListItem({ @required Order order}){
+    return ExpansionTile(title: Text(''));
   }
 }

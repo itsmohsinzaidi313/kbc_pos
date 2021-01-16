@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:kbc_pos/models/objects/item.dart';
 import 'package:kbc_pos/models/objects/member.dart';
 
@@ -32,8 +34,22 @@ class Order {
     orderTable :  table
   };
 
+  factory Order.fromJson(Map<String, dynamic> map) => Order(
+    member: memberListFromJson(json.decode(jsonEncode(map[orderItemsList]))),
+    item: itemListFromJson(json.decode(jsonEncode(map[orderMembersList]))),
+    orderNo: map[orderOrderNo],
+    cover: map[orderCover],
+    slip: map[orderSlip],
+    venue: map[orderVenue],
+    session: map[orderSession],
+    waiter: map[orderWaiter],
+    table: map[orderTable],
+  );
+
   @override
   String toString() {
     return 'Order{item: $item, member: $member, orderNo: $orderNo, cover: $cover, slip: $slip, venue: $venue, session: $session, waiter: $waiter, table: $table}';
   }
 }
+
+List<Order> orderListFromJson(String str) => List<Order>.from(json.decode(str)['Data'].map((x) => Order.fromJson(x)));

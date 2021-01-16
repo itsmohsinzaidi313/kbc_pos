@@ -9,7 +9,7 @@ class CustomCircularProgressIndication extends StatelessWidget {
       flex: 1,
       child: Center(
         child: ListTile(
-          tileColor: Colors.white,
+          tileColor: Colors.grey[200],
           title: Text(
             'Loading...',
             style: GoogleFonts.aBeeZee(
@@ -19,7 +19,7 @@ class CustomCircularProgressIndication extends StatelessWidget {
               letterSpacing: 0.5,
             ),
           ),
-          trailing: SizedBox(
+          leading: SizedBox(
             height: 25,
             width: 25,
             child: CircularProgressIndicator(

@@ -1,11 +1,22 @@
 import 'dart:convert';
 
 class Location {
-  final int locationId;
+
+  static final String locId = 'Id';
+  static final String locCode = 'Code';
+  static final String locName = 'Name';
+
+  final String locationId;
   final String locationCode, locationName;
 
   const Location({this.locationId, this.locationCode, this.locationName});
 
+  factory Location.fromJson(Map<String, dynamic> map) =>
+    Location(
+      locationId: map[locId],
+      locationName: map[locName],
+      locationCode: map[locCode]
+    );
 
   @override
   String toString() {
@@ -13,4 +24,4 @@ class Location {
   }
 }
 
-// List<Location> locationListFromJson(String str) => List<Location>.from(json.decode(str)['Data'].map((x) => ))
+List<Location> locationListFromJson(String str) => List<Location>.from(json.decode(str)['Data'].map((x) => Location.fromJson(x)));

@@ -40,6 +40,15 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
         _cartList.add(item);
         yield state.copyWith(cartItemsList:_cartList);
       }
+      else {
+        _cartList.forEach((element) {
+          if(element == item)
+          {
+            element.quantity = element.quantity +1;
+          }
+        });
+        yield state.copyWith(cartItemsList: _cartList);
+      }
     } else if (event is PlusCartItem){
       Item x = _cartList.elementAt(event.index);
       x.quantity = x.quantity +1;
@@ -51,8 +60,8 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
         yield state.copyWith(cartItemsList: _cartList);
       }
     } else if (event is RemoveCartItem){
-      // Item x = _cartList.elementAt(event.index);
-      // x.quantity = x.quantity -1;
+      Item x = _cartList.elementAt(event.index);
+      x.quantity = 1;
       _cartList.removeAt(event.index);
       yield state.copyWith(cartItemsList: _cartList);
     } else if (event is PosOrderSubmitted){

@@ -17,6 +17,7 @@ class Config {
   static final String searchMembersAPI = "$commonAPI/searchmember$key&phrase=";
   static final String searchItemAPI = "$commonAPI/searchitems$key&phrase=";
   static final String sendOrderAPI = "$commonAPI/neworder$key";
+  static final String getOrderAPI = "$commonAPI/neworder$key";
 
   setLoginUserAPI(String username, String password){
     loginUserAPI = "${loginUserAPI}username=$username&password=$password";

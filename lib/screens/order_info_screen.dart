@@ -88,14 +88,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                           radioButtons: SizedBox(),
                           onBackPressed: () => Navigator.pop(context),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            seeMultipleMembers(
-                                context: context,
-                                member: state.selectedMember),
-                          ],
-                        ),
+
                         Row(
                           mainAxisAlignment:
                               MainAxisAlignment.spaceBetween,
@@ -175,11 +168,18 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                   margin: EdgeInsets.symmetric(
                     vertical: 20.0,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      submitButton(),
-                    ],
+                  child: BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+                    builder: (context, state){
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          seeMultipleMembers(
+                              context: context,
+                              member: state.selectedMember),
+                          submitButton(),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ],
@@ -193,38 +193,54 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   Widget submitButton() {
     return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
       builder: (context, state) {
-        return SizedBox(
-          width: Config.getDeviceWidth(context) * 0.4,
-          height: Config.getDeviceHeight(context) * 0.08,
-          child: RaisedButton.icon(
-            onPressed: state.status.isValidated
-                ? () {
-                    context.read<OrderInfoBloc>().add(
-                        OrderSubmitted(order: Order(
-                          member: state.selectedMember,
-                          orderNo: state.orderNo,
-                          slip: state.slip,
-                          cover: state.cover,
-                          waiter: state.waiter.value,
-                          table: state.tableNo.value,
-                          session: state.selectedSession.sessionId.toString(),
-                          venue: state.selectedLocation.locationId.toString()
-                        )));
-                  }
-                : null,
-            color: AppTheme.listTextColor,
-            label: Text(
-              'SUBMIT',
-              style: GoogleFonts.ubuntuCondensed(
-                color: Colors.white,
-                letterSpacing: 1.0,
-                fontSize: 20,
+        return Padding(
+          padding: const EdgeInsets.only(right: 5.0),
+          child: SizedBox(
+            width: Config.getDeviceWidth(context) * 0.4,
+            height: Config.getDeviceHeight(context) * 0.08,
+            child: RaisedButton.icon(
+              onPressed: state.selectedMember.length > 0
+                  ? () {
+                      context.read<OrderInfoBloc>().add(
+                          OrderSubmitted(order: Order(
+                            member: state.selectedMember,
+                            orderNo: state.orderNo,
+                            slip: state.slip,
+                            cover: state.cover,
+                            waiter: state.waiter.value,
+                            table: state.tableNo.value,
+                            session: state.selectedSession.sessionId.toString(),
+                            venue: state.selectedLocation.locationId.toString()
+                          )));
+                    }
+                  : null,
+              color: AppTheme.listTextColor,
+              label: Flexible(
+                flex: 1,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'SUBMIT',
+                      style: GoogleFonts.ubuntuCondensed(
+                        color: Colors.white,
+                        letterSpacing: 1.0,
+                        fontSize: 20,
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward,
+                      color: state.selectedMember.length > 0 ? Colors.white : Colors.grey[300],
+                      size: 20,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            icon: Icon(
-              Icons.check,
-              color: Colors.green,
-              size: 20,
+              icon: Icon(
+                state.selectedMember.length > 0 ? Icons.check : Icons.clear_rounded,
+                color: state.selectedMember.length > 0 ? Colors.green : Colors.red,
+                size: 20,
+              ),
             ),
           ),
         );

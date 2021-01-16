@@ -46,15 +46,15 @@ class PosService extends PosRepo{
 
   @override
   Future<ResponseDetail> sendOrder(Map<String, dynamic> map) async{
-    Map<String, dynamic> mMap = {'' : map};
-    String mMapJson = jsonEncode(mMap);
-    print(mMapJson);
+    // Map<String, dynamic> mMap = {'' : map};
+    // String mMapJson = jsonEncode(mMap);
+    // print(mMapJson);
     String url = Config.sendOrderAPI;
     final response = await http.post(url,
         headers: {'Content-type' : 'application/json'},
-      body: mMapJson
+      body: '"$map"',
     );
-    print(response.body);
+    // print(response.body);
     // Map responseMap;
     // responseMap = jsonDecode(response.body);
     // responseMap.forEach((key, value) {print('$key : $value');});
