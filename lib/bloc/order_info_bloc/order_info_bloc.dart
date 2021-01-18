@@ -101,7 +101,6 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
       if (state.status.isValidated) {
         yield state.copyWith(status: FormzStatus.submissionSuccess);
       }
-
     }
   }
 

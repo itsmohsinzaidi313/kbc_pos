@@ -14,13 +14,14 @@ class Order {
   static final String orderSession = 'orderSession';
   static final String orderWaiter = 'orderWaiter';
   static final String orderTable = 'orderTable';
+  static final String orderUserId = 'userId';
 
   final List<Item> item;
   final List<Member> member;
-  final String orderNo, cover, slip, venue, session, waiter, table;
+  final String orderNo, cover, slip, venue, session, waiter, table, userId;
 
   const Order({ this.item, this.member, this.orderNo, this.cover, this.slip,
-    this.venue, this.session, this.waiter, this.table });
+    this.venue, this.session, this.waiter, this.table, this.userId });
 
   Map<String, dynamic> toJson() => {
     orderItemsList : item.map((e) => e.toJson()).toList(),
@@ -31,7 +32,8 @@ class Order {
     orderVenue : venue,
     orderSession : session,
     orderWaiter : waiter,
-    orderTable :  table
+    orderTable :  table,
+    orderUserId : userId
   };
 
   factory Order.fromJson(Map<String, dynamic> map) => Order(
@@ -44,11 +46,12 @@ class Order {
     session: map[orderSession],
     waiter: map[orderWaiter],
     table: map[orderTable],
+    userId: map[orderUserId]
   );
 
   @override
   String toString() {
-    return 'Order{item: $item, member: $member, orderNo: $orderNo, cover: $cover, slip: $slip, venue: $venue, session: $session, waiter: $waiter, table: $table}';
+    return 'Order{item: $item, member: $member, orderNo: $orderNo, cover: $cover, slip: $slip, venue: $venue, session: $session, waiter: $waiter, table: $table, userId: $userId}';
   }
 }
 
