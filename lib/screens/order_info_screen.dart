@@ -22,6 +22,7 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'custom_widget_classes/custom_appbar.dart';
 
 class OrderInfoScreen extends StatefulWidget {
+
   @override
   _OrderInfoScreenState createState() => _OrderInfoScreenState();
 }
@@ -33,24 +34,40 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   final controller = FloatingSearchBarController();
   final _waiterFocusNode = FocusNode();
   final _tableNoFocusNode = FocusNode();
+  final _coverFocusNode = FocusNode();
   bool isProgressing = false;
   dynamic read;
+  Map<String, dynamic> args;
 
   @override
   void initState() {
     super.initState();
     read =  context.read<OrderInfoBloc>();
-    context.read<OrderInfoBloc>().add(FetchingLists());
-    _waiterFocusNode.addListener(() {
-      if (!_waiterFocusNode.hasFocus) {
-        context.read<OrderInfoBloc>().add(WaiterUnfocused());
-        FocusScope.of(context).requestFocus(_tableNoFocusNode);
-      }
-    });
-    _tableNoFocusNode.addListener(() {
-      if (!_tableNoFocusNode.hasFocus) {
-        context.read<OrderInfoBloc>().add(TableNoUnfocused());
-      }
+    Future.delayed(Duration.zero, (){
+      args = ModalRoute.of(context).settings.arguments;
+      context.read<OrderInfoBloc>().add(FetchingLists());
+      /*if(args[Order.isEditing] == 0){
+        context.read<OrderInfoBloc>().add(FetchingLists());
+      } else if (args[Order.isEditing] == 1){
+        context.read<OrderInfoBloc>().add(OrderEditing(deviceKey: args[Order.deviceKEY]));
+      }*/
+      _waiterFocusNode.addListener(() {
+        if (!_waiterFocusNode.hasFocus) {
+          context.read<OrderInfoBloc>().add(WaiterUnfocused());
+          FocusScope.of(context).requestFocus(_tableNoFocusNode);
+        }
+      });
+      _tableNoFocusNode.addListener(() {
+        if (!_tableNoFocusNode.hasFocus) {
+          context.read<OrderInfoBloc>().add(TableNoUnfocused());
+          FocusScope.of(context).requestFocus(_coverFocusNode);
+        }
+      });
+      _coverFocusNode.addListener(() {
+        if (!_coverFocusNode.hasFocus) {
+          context.read<OrderInfoBloc>().add(CoverUnfocused());
+        }
+      });
     });
   }
 
@@ -126,10 +143,6 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                               text: '...',
                             ),
                             CustomLabelledTextView(
-                              labelName: 'Covers',
-                              text: '...',
-                            ),
-                            CustomLabelledTextView(
                               labelName: 'Slip',
                               text: '...',
                             ),
@@ -155,19 +168,22 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                     TableInput(
                       focusNode: _tableNoFocusNode,
                     ),
+                    CoverInput(
+                      focusNode: _coverFocusNode,
+                    ),
                   ],
                 ),
-                /*Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     AtPartyCheckBox(),
-                    WithSpouseCheckBox(),
+                    // WithSpouseCheckBox(),
                   ],
-                ),*/
+                ),
                 Container(
-                  margin: EdgeInsets.symmetric(
-                    vertical: 20.0,
-                  ),
+                  // margin: EdgeInsets.symmetric(
+                  //   vertical: 20.0,
+                  // ),
                   child: BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
                     builder: (context, state){
                       return Row(
@@ -206,7 +222,9 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                             member: state.selectedMember,
                             orderNo: state.orderNo,
                             slip: state.slip,
-                            cover: state.cover,
+                            atParty: state.atParty,
+                            userId: Config.userId,
+                            cover: state.cover.value,
                             waiter: state.waiter.value,
                             table: state.tableNo.value,
                             session: state.selectedSession.sessionId.toString(),
@@ -376,7 +394,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
           await _showDialog(member);
         },
         child: Container(
-          padding: EdgeInsets.all(12.0),
+          padding: EdgeInsets.all(10.0),
           margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
           decoration: BoxDecoration(
             shape: BoxShape.rectangle,
@@ -618,11 +636,11 @@ class WaiterInput extends StatelessWidget {
                     ? 'Please ensure the waiter entered is valid'
                     : null,
               ),
-              keyboardType: TextInputType.text,
+              keyboardType: TextInputType.number,
               onChanged: (value) {
                 context.read<OrderInfoBloc>().add(WaiterChanged(waiter: value));
               },
-              textInputAction: TextInputAction.done,
+              textInputAction: TextInputAction.next,
             ),
           ),
         );
@@ -658,11 +676,53 @@ class TableInput extends StatelessWidget {
                     ? 'Please ensure the table no entered is valid'
                     : null,
               ),
-              keyboardType: TextInputType.text,
+              keyboardType: TextInputType.number,
               onChanged: (value) {
                 context
                     .read<OrderInfoBloc>()
                     .add(TableNoChanged(tableNo: value));
+              },
+              textInputAction: TextInputAction.next,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class CoverInput extends StatelessWidget {
+  const CoverInput({Key key, this.focusNode}) : super(key: key);
+
+  final FocusNode focusNode;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+      builder: (context, state) {
+        return Flexible(
+          flex: 1,
+          child: Container(
+            padding: EdgeInsets.all(3.0),
+            margin: EdgeInsets.all(5.0),
+            child: TextFormField(
+              // initialValue: state.password.value,
+              focusNode: focusNode,
+              decoration: InputDecoration(
+                icon: const Icon(Icons.dialpad),
+                labelText: 'Cover',
+                helperText: 'Please enter valid cover no',
+                helperMaxLines: 2,
+                errorMaxLines: 2,
+                errorText: state.tableNo.invalid
+                    ? 'Please ensure the cover no entered is valid'
+                    : null,
+              ),
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                context
+                    .read<OrderInfoBloc>()
+                    .add(CoverChanged(cover: value));
               },
               textInputAction: TextInputAction.done,
             ),
@@ -672,6 +732,7 @@ class TableInput extends StatelessWidget {
     );
   }
 }
+
 
 class AtPartyCheckBox extends StatelessWidget {
   @override

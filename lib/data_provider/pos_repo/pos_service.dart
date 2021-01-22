@@ -47,9 +47,11 @@ class PosService extends PosRepo{
   @override
   Future<ResponseDetail> sendOrder(Map<String, dynamic> map) async{
     // Map<String, dynamic> mMap = {'' : map};
+    print('JSON OBJECT: $map');
     String mMapJson = jsonEncode(map);
+    print('JSON ENCODE: $map');
     String mMapJsonReplace = mMapJson.replaceAll('"', '\\"');
-    print('JSON ENCODE: $mMapJsonReplace');
+    print('JSON REPLACE ENCODE: $mMapJsonReplace');
     // print('JSON DECODE: $jsonDecode($mMapJson)');
     String url = Config.sendOrderAPI;
     final response = await http.post(url,
@@ -60,7 +62,6 @@ class PosService extends PosRepo{
     // Map responseMap;
     // responseMap = jsonDecode(response.body);
     // responseMap.forEach((key, value) {print('$key : $value');});
-    //
     if(response.statusCode == 200){
       print(response.body);
       return ResponseDetail(status: true, message: response.reasonPhrase);

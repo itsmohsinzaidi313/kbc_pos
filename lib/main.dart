@@ -65,7 +65,7 @@ void main() {
                 child: PosScreen(),
               ),
           '/settingScreen': (context) => SettingsScreen(),
-          '/orderScreen': (context) => OrderScreen(),
+          '/ordersScreen': (context) => OrderScreen(),
         },
         theme: ThemeData(
           brightness: Brightness.light,

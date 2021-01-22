@@ -13,26 +13,32 @@ class Config {
   static final String getItemsAPI = "$commonAPI/getitems$key&categoryid=";
   static final String getSessionsAPI = "$commonAPI/getsession$key";
   static final String getLocationsAPI = "$commonAPI/getlocation$key";
-  static String loginUserAPI = "$commonAPI/getuser$key&";
+  static String loginUserAPI = "";
   static final String searchMembersAPI = "$commonAPI/searchmember$key&phrase=";
   static final String searchItemAPI = "$commonAPI/searchitems$key&phrase=";
   static final String sendOrderAPI = "$commonAPI/neworder$key";
   static final String getOrderAPI = "$commonAPI/neworder$key";
 
   setLoginUserAPI(String username, String password){
-    loginUserAPI = "${loginUserAPI}username=$username&password=$password";
+    loginUserAPI = "$commonAPI/getuser$key&username=$username&password=$password";
   }
 
   getLoginUserAPI() => loginUserAPI;
   //endregion
 
-  //region ___USER OBJECT___
-  static int _userId;
-
-  static int get userId => _userId;
-
-  static set userId(int value) {
+  //region ___USER ID___
+  static String _userId;
+  static String get userId => _userId;
+  static set userId(String value) {
     _userId = value;
+  }
+  //endregion
+
+  //region ___DEVICE KEY___
+  static String _deviceKey;
+  static String get deviceKey => _deviceKey;
+  static set deviceKey(String value) {
+    _deviceKey = value;
   }
   //endregion
 

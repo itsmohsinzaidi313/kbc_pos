@@ -49,6 +49,12 @@ class WaiterChanged extends OrderInfoEvent{
   const WaiterChanged({ this.waiter});
 }
 
+class CoverChanged extends OrderInfoEvent{
+
+  final String cover;
+  const CoverChanged({ this.cover});
+}
+
 class TableNoChanged extends OrderInfoEvent{
 
   final String tableNo;
@@ -82,8 +88,15 @@ class WaiterUnfocused extends OrderInfoEvent{}
 
 class TableNoUnfocused extends OrderInfoEvent{}
 
+class CoverUnfocused extends OrderInfoEvent{}
+
 class OrderSubmitted extends OrderInfoEvent{
   final Order order;
   OrderSubmitted({ this.order});
+}
+
+class OrderEditing extends OrderInfoEvent{
+  final String deviceKey;
+  OrderEditing({this.deviceKey});
 }
 

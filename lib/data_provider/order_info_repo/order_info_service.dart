@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:kbc_pos/models/objects/location.dart';
 import 'package:kbc_pos/models/objects/member.dart';
 import 'package:kbc_pos/models/objects/session.dart';
@@ -11,6 +10,7 @@ abstract class OrderInfoRepo{
   Future<List<Member>> getMembers(String query);
   Future<List<Location>> getLocation();
   Future<List<Session>> getSession();
+
 }
 
 class OrderInfoService extends OrderInfoRepo{

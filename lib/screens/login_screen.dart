@@ -12,14 +12,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   final _usernameFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
   bool _obscureText = true;
 
   Icon _icon = Icon(Icons.visibility_off);
-  String errorEmail = '',
-      errorPassword = '';
+  String errorEmail = '', errorPassword = '';
   Color activeColor = Colors.yellow[700];
 
   @override
@@ -42,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _obscureText = !_obscureText;
       _icon =
-      _obscureText ? Icon(Icons.visibility_off) : Icon(Icons.visibility);
+          _obscureText ? Icon(Icons.visibility_off) : Icon(Icons.visibility);
     });
   }
 
@@ -95,8 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       shape: BoxShape.rectangle,
                       borderRadius: BorderRadius.horizontal(
-                        right:
-                        Radius.circular(Config.getDeviceHeight(context)),
+                        right: Radius.circular(Config.getDeviceHeight(context)),
                       ),
                       color: Colors.amber,
                       image: DecorationImage(
@@ -139,7 +136,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                             bottom: BorderSide(
                                                 color: Colors.grey[100]))),
                                     child: UsernameInput(
-                                      focusNode: _usernameFocusNode,),
+                                      focusNode: _usernameFocusNode,
+                                    ),
                                   ),
                                   Container(
                                     padding: EdgeInsets.all(5),
@@ -148,7 +146,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                         Positioned(
                                           child: PasswordInput(
                                             focusNode: _passwordFocusNode,
-                                            obscureText: _obscureText,),
+                                            obscureText: _obscureText,
+                                          ),
                                         ),
                                         Positioned(
                                           right: 5,
@@ -179,7 +178,6 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
 }
 
 class UsernameInput extends StatelessWidget {
@@ -253,7 +251,7 @@ class SubmitButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, MyLoginState>(
-      buildWhen: (previous, current) => previous.status != current.status,
+      // buildWhen: (previous, current) => previous.status != current.status,
       builder: (context, state) {
         return Container(
           height: 50,
@@ -265,7 +263,8 @@ class SubmitButton extends StatelessWidget {
                 Colors.amber,
               ],
             ),
-            boxShadow: [
+            boxShadow:
+            [
               BoxShadow(
                   offset: Offset(10, 10),
                   color: Colors.grey[300],
@@ -273,16 +272,18 @@ class SubmitButton extends StatelessWidget {
               BoxShadow(
                   offset: Offset(-10, -10),
                   color: Colors.grey[300],
-                  blurRadius: 20)
+                  blurRadius: 20),
             ],
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
               splashColor: Colors.yellow[100],
-              onTap: state.status.isValidated
-                  ? () => context.read<LoginBloc>().add(FormSubmitted())
-                  : null,
+              onTap:() {
+                      print('Button Status: ${state.status.isValidated}');
+                      print('Button clicked');
+                      context.read<LoginBloc>().add(FormSubmitted());
+                    },
               child: Center(
                 child: Text(
                   'Login',
@@ -301,11 +302,10 @@ class SubmitButton extends StatelessWidget {
 }
 
 class MyDialog extends StatelessWidget {
-
   final String message;
   final BuildContext mContext;
 
-  MyDialog({ this.message, this.mContext });
+  MyDialog({this.message, this.mContext});
 
   @override
   Widget build(BuildContext mContext) {
@@ -321,8 +321,8 @@ class MyDialog extends StatelessWidget {
             Row(
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                 Icon(Icons.info),
-                 Flexible(
+                Icon(Icons.info),
+                Flexible(
                   child: Padding(
                     padding: EdgeInsets.all(10),
                     child: Text(

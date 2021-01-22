@@ -28,7 +28,6 @@ class _OrderScreenState extends State<OrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.grey[200],
-        key: _key,
         appBar: AppTheme.appBarNormal(
             appBarTitle: 'New Order',
             appBarBgColor: AppTheme.appBarColor,
@@ -43,7 +42,6 @@ class _OrderScreenState extends State<OrderScreen> {
                 builder: (context, state) {
                   if (state is MyOrderStateList) {
                     return ListView.builder(
-                      key: _key,
                       scrollDirection: Axis.vertical,
                       physics: ClampingScrollPhysics(),
                       shrinkWrap: true,
@@ -85,7 +83,10 @@ class _OrderScreenState extends State<OrderScreen> {
                 IconButton(
                     icon: Icon(Icons.edit_rounded),
                     onPressed: () {
-                      print('Order Editing');
+                      Navigator.pushNamed(context, '/orderInfoScreen', arguments: {
+                        Order.isEditing : 1,
+                        Order.deviceKEY : order.deviceKey
+                      });
                     }),
                 IconButton(
                     icon: Icon(Icons.delete_rounded),

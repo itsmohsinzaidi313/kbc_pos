@@ -54,8 +54,8 @@ class _PosScreenState extends State<PosScreen> {
         listenWhen: (pre, curr) => pre.states != curr.states,
         listener: (context, states) {
           if (states.states == PosStates.successful) {
-            // AppTheme.mySnackBar(
-            //     context: context, msg: 'List Fetched Successfully..');
+            Navigator.pushNamedAndRemoveUntil(context, '/dashboardScreen',
+                    (Route<dynamic> route) => false);
           } else if (states.error.toString().isNotEmpty) {
             AppTheme.mySnackBar(context: context, msg: states.error);
           } else if (states.states == PosStates.inProgress) {

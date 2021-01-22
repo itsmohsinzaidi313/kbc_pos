@@ -4,6 +4,7 @@ import 'package:formz/formz.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_events.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_states.dart';
 import 'package:kbc_pos/data_provider/order_info_repo/order_info_service.dart';
+import 'package:kbc_pos/models/model_order_info/covers.dart';
 import 'package:kbc_pos/models/model_order_info/table_no.dart';
 import 'package:kbc_pos/models/model_order_info/waiter.dart';
 import 'package:kbc_pos/models/objects/location.dart';
@@ -50,21 +51,25 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
     } else if (event is WaiterUnfocused) {
       final waiter = Waiter.dirty(state.waiter.value);
       yield state.copyWith(
-          waiter: waiter, status: Formz.validate([waiter, state.tableNo]));
+          waiter: waiter, status: Formz.validate([waiter, state.tableNo, state.cover]));
+    } else if (event is CoverUnfocused) {
+      final cover = Covers.dirty(state.cover.value);
+      yield state.copyWith(
+          cover: cover, status: Formz.validate([state.waiter, state.tableNo, cover]));
     } else if (event is TableNoUnfocused) {
       final tableNo = TableNo.dirty(state.tableNo.value);
       yield state.copyWith(
-          tableNo: tableNo, status: Formz.validate([state.waiter, tableNo]));
+          tableNo: tableNo, status: Formz.validate([state.waiter, tableNo, state.cover]));
     } else if (event is WaiterChanged) {
       final waiter = Waiter.dirty(event.waiter);
       yield state.copyWith(
           waiter: waiter.valid ? waiter : Waiter.pure(event.waiter),
-          status: Formz.validate([waiter, state.tableNo]));
+          status: Formz.validate([waiter, state.tableNo, state.cover]));
     } else if (event is TableNoChanged) {
       final tableNo = TableNo.dirty(event.tableNo);
       yield state.copyWith(
           tableNo: tableNo.valid ? tableNo : TableNo.pure(event.tableNo),
-          status: Formz.validate([state.waiter, tableNo]));
+          status: Formz.validate([state.waiter, tableNo, state.cover]));
     } else if (event is SelectedMember) {
       if(!_selectedMembersList.contains(event.member)){
         _selectedMembersList.add(event.member);
@@ -73,7 +78,12 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
      else{
         yield state.copyWith(error: 'Member Already Exist');
       }
-    } else if(event is ByCodeChanged){
+    } else if(event is CoverChanged){
+      final cover = Covers.dirty(event.cover);
+      yield state.copyWith(cover: cover.valid ? cover : Covers.pure(event.cover),
+      status: Formz.validate([cover, state.waiter, state.tableNo]));
+    }
+    else if(event is ByCodeChanged){
       yield state.copyWith(byCode: event.byCode, radioGroupValue: event.byCode);
     } else if(event is ByNameChanged){
       yield state.copyWith(byName: event.byName, radioGroupValue: event.byName);
@@ -91,15 +101,26 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
     } else if (event is OrderSubmitted) {
       final waiter = Waiter.dirty(state.waiter.value);
       final tableNo = TableNo.dirty(state.tableNo.value);
+      final cover = Covers.dirty(state.cover.value);
       yield state.copyWith(
         waiter: waiter,
         tableNo: tableNo,
+        cover: cover,
+        atParty: state.atParty,
         order: event.order,
         status: Formz.validate([waiter, tableNo],),
       );
 
       if (state.status.isValidated) {
         yield state.copyWith(status: FormzStatus.submissionSuccess);
+      }
+    } else if (event is OrderEditing){
+      try{
+
+      }
+      catch(e){
+        yield state.copyWith(error: e.toString());
+        print(e.toString());
       }
     }
   }

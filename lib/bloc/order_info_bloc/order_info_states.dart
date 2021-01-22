@@ -1,6 +1,6 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:formz/formz.dart';
+import 'package:kbc_pos/models/model_order_info/covers.dart';
 import 'package:kbc_pos/models/model_order_info/table_no.dart';
 import 'package:kbc_pos/models/model_order_info/waiter.dart';
 import 'package:kbc_pos/models/objects/location.dart';
@@ -22,8 +22,10 @@ class MyOrderInfoStates{
   final TableNo tableNo;
   final List<Member> selectedMember;
   final String byCode, byName, radioGroupValue;
-  final String orderNo, slip, cover;
+  final String orderNo, slip;
+  final Covers cover;
   final Order order;
+  final int isEditing;
 
   MyOrderInfoStates(
       {this.membersList = const [],
@@ -37,14 +39,15 @@ class MyOrderInfoStates{
         this.status = FormzStatus.pure,
         this.waiter = const Waiter.pure(),
         this.tableNo = const TableNo.pure(),
+        this.cover = const Covers.pure(),
         this.selectedMember = const [],
         this.byCode = 'By Code',
         this.byName = 'By Name',
         this.radioGroupValue = 'By Code',
         this.orderNo = '',
         this.slip = '',
-        this.cover = '',
-        this.order =  const Order()
+        this.order =  const Order(),
+        this.isEditing = 0
       });
 
   MyOrderInfoStates copyWith(
@@ -66,8 +69,9 @@ class MyOrderInfoStates{
         FormzStatus status,
         String orderNo,
         String slip,
-        String cover,
-        Order order
+        Covers cover,
+        Order order,
+        int isEditing
       }) {
     return MyOrderInfoStates(
         membersList: membersList ?? this.membersList,
@@ -88,7 +92,8 @@ class MyOrderInfoStates{
       orderNo: orderNo ?? this.orderNo,
       cover: cover ?? this.cover,
       slip: slip ?? this.slip,
-      order: order ?? this.order
+      order: order ?? this.order,
+      isEditing: isEditing ?? this.isEditing
     );
   }
 

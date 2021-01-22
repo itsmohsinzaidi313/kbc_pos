@@ -1,6 +1,5 @@
 import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:kbc_pos/models/generic/response_detail.dart';
 import 'package:http/http.dart' as http;
 import 'package:kbc_pos/shared/config.dart';
@@ -16,7 +15,7 @@ class LoginService extends LoginRepo {
     ResponseDetail responseDetail;
     Config().setLoginUserAPI(username, password);
     String _url = Config().getLoginUserAPI();
-    final response = await http.get(_url).timeout(Duration(seconds: 5), onTimeout: (){
+    final response = await http.get(_url).timeout(Duration(seconds: 7), onTimeout: (){
       throw Exception('**Time Out**.. Something went wrong!');
     });
     dynamic js;
