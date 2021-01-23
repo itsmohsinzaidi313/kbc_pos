@@ -26,6 +26,9 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
     if (event is FetchingLists) {
       try {
         yield FetchingListInProgress();
+        _selectedMembersList.clear();
+        yield state.copyWith( atParty: false, cover: Covers.pure(''), isEditing: 0, selectedMember: [], selectedSession: Session(),
+          selectedLocation: Location(), sessionList: [], membersList: [], venueList: [], );
         List<Location> location = await orderInfoRepo.getLocation();
         List<Session> session = await orderInfoRepo.getSession();
         locationMapListToDropdownMenuItemList(list: location);

@@ -15,7 +15,7 @@ class LoginService extends LoginRepo {
     ResponseDetail responseDetail;
     Config().setLoginUserAPI(username, password);
     String _url = Config().getLoginUserAPI();
-    final response = await http.get(_url).timeout(Duration(seconds: 7), onTimeout: (){
+    final response = await http.get(_url).timeout(Duration(seconds: 10), onTimeout: (){
       throw Exception('**Time Out**.. Something went wrong!');
     });
     dynamic js;

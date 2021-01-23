@@ -19,15 +19,16 @@ class Order {
   static final String orderUserId = 'userId';
   static final String orderDeviceKey = 'deviceKey';
   static final String orderAtParty = 'atParty';
+  static final String orderOrderKey = 'orderKey';
 
   final List<Item> item;
   final List<Member> member;
-  final String orderNo, cover, slip, venue, session, waiter,
+  final String orderNo, cover, slip, venue, session, waiter, orderKey,
       table, userId, deviceKey;
   final bool atParty;
 
   const Order({ this.atParty ,this.item, this.member, this.orderNo, this.cover, this.slip,
-    this.venue, this.session, this.waiter, this.table, this.userId, this.deviceKey });
+    this.venue, this.session, this.waiter, this.table, this.userId, this.orderKey ,this.deviceKey });
 
   Map<String, dynamic> toJson() => {
     orderItemsList : item.map((e) => e.toJson()).toList(),
@@ -41,7 +42,8 @@ class Order {
     orderTable :  table,
     orderUserId : userId,
     orderDeviceKey : deviceKey,
-    orderAtParty : atParty
+    orderAtParty : atParty,
+    orderOrderKey : orderKey
   };
 
   factory Order.fromJson(Map<String, dynamic> map) => Order(
@@ -56,13 +58,14 @@ class Order {
     table: map[orderTable],
     userId: map[orderUserId],
     deviceKey: map[orderDeviceKey],
-    atParty: map[orderAtParty]
+    atParty: map[orderAtParty],
+    orderKey: map[orderOrderKey]
   );
 
   @override
   String toString() {
     return 'Order{item: $item, member: $member, orderNo: $orderNo, cover: $cover, slip: $slip, '
-        'venue: $venue, AtParty: $atParty, session: $session, waiter: $waiter, table: $table, userId: $userId, deviceKey: $deviceKey}';
+        'venue: $venue, orderKey: $orderKey, AtParty: $atParty, session: $session, waiter: $waiter, table: $table, userId: $userId, deviceKey: $deviceKey}';
   }
 }
 

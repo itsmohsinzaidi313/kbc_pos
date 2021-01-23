@@ -67,13 +67,15 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
       yield state.copyWith(cartItemsList: _cartList);
     } else if (event is PosOrderSubmitted){
       try {
-
         Order order = event.order;
         Order order2 = Order(atParty: order.atParty ,item: state.cartItemsList, member: order.member, orderNo: order.orderNo,
-                  cover: order.cover, session: order.session, slip: order.slip, table: order.table, venue: order.venue, waiter: order.waiter, userId: order.userId, deviceKey: Config.deviceKey ?? '');
-        yield state.copyWith(states: PosStates.inProgress,/* categoriesList: state.categoriesList, cartItemsList: state.cartItemsList, itemsList: state.itemsList*/);
+                  cover: order.cover, session: order.session, slip: order.slip, table: order.table, venue: order.venue,
+            waiter: order.waiter, userId: order.userId, deviceKey: Config.deviceKey ?? '');
+        yield state.copyWith(states: PosStates.inProgress, /* categoriesList: state.categoriesList, cartItemsList: state.cartItemsList, itemsList: state.itemsList*/);
         ResponseDetail responseDetail = await posRepo.sendOrder(order2.toJson());
-        if(responseDetail.status) yield state.copyWith(states: PosStates.successful);
+        if(responseDetail.status) {
+          yield state.copyWith(states: PosStates.successful);
+        }
       } catch (e) {
         yield state.copyWith(error: e.toString());
         print(e);

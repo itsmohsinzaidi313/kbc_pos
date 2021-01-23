@@ -24,17 +24,12 @@ import 'package:kbc_pos/shared/config.dart';
 import 'custom_widget_classes/custom_appbar.dart';
 
 class PosScreen extends StatefulWidget {
-  static GlobalKey<AnimatedListState> _listKey = GlobalKey();
-
   @override
   _PosScreenState createState() => _PosScreenState();
 }
 
 class _PosScreenState extends State<PosScreen> {
   GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
-  GlobalKey<AutoCompleteTextFieldState<Member>> _tKey =
-      GlobalKey<AutoCompleteTextFieldState<Member>>();
-
   String radioGroupValue = 'By Code';
   final TextEditingController _autoCompleteController = TextEditingController();
 
@@ -53,9 +48,14 @@ class _PosScreenState extends State<PosScreen> {
       body: BlocListener<PosBloc, MyPosStates>(
         listenWhen: (pre, curr) => pre.states != curr.states,
         listener: (context, states) {
-          if (states.states == PosStates.successful) {
-            Navigator.pushNamedAndRemoveUntil(context, '/dashboardScreen',
-                    (Route<dynamic> route) => false);
+          if (states.states == PosStates.successful){
+
+            AppTheme.showAlertDialogOK(context,
+            title: 'Message',
+            message: 'Order has been punched successfully',
+            onOK: () => Navigator.pushNamedAndRemoveUntil(context, '/dashboardScreen',
+                    (Route<dynamic> route) => false),);
+
           } else if (states.error.toString().isNotEmpty) {
             AppTheme.mySnackBar(context: context, msg: states.error);
           } else if (states.states == PosStates.inProgress) {

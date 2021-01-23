@@ -74,7 +74,8 @@ class MyOrderInfoStates{
         int isEditing
       }) {
     return MyOrderInfoStates(
-        membersList: membersList ?? this.membersList,
+        membersList:
+        membersList ?? this.membersList,
         locationList: venueList ?? this.locationList,
         sessionList: sessionList ?? this.sessionList,
         error: error ?? this.error,
