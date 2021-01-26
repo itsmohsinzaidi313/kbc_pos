@@ -18,6 +18,7 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
   @override
   Stream<MyPosStates> mapEventToState(PosEvent event) async*{
     if(event is FetchAllLists){
+      _cartList.clear();
       yield state.copyWith(states: PosStates.inProgress);
       try{
         List<Category> list = await posRepo.getCategories();
@@ -39,7 +40,7 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
       Item item = event.item;
       if(!_cartList.contains(item)){
         _cartList.add(item);
-        yield state.copyWith(cartItemsList:_cartList);
+        yield state.copyWith(cartItemsList:_cartList, totalCartAmount: getCartTotalAmount(cartList: _cartList));
       }
       else {
         _cartList.forEach((element) {
@@ -48,23 +49,23 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
             element.quantity = element.quantity +1;
           }
         });
-        yield state.copyWith(cartItemsList: _cartList);
+        yield state.copyWith(cartItemsList:_cartList, totalCartAmount: getCartTotalAmount(cartList: _cartList));
       }
     } else if (event is PlusCartItem){
       Item x = _cartList.elementAt(event.index);
       x.quantity = x.quantity +1;
-      yield state.copyWith(cartItemsList: _cartList);
+      yield state.copyWith(cartItemsList:_cartList, totalCartAmount: getCartTotalAmount(cartList: _cartList));
     } else if (event is MinusCartItem){
       Item x = _cartList.elementAt(event.index);
       if(x.quantity > 1){
         x.quantity = x.quantity -1;
-        yield state.copyWith(cartItemsList: _cartList);
+        yield state.copyWith(cartItemsList:_cartList, totalCartAmount: getCartTotalAmount(cartList: _cartList));
       }
     } else if (event is RemoveCartItem){
       Item x = _cartList.elementAt(event.index);
       x.quantity = 1;
       _cartList.removeAt(event.index);
-      yield state.copyWith(cartItemsList: _cartList);
+      yield state.copyWith(cartItemsList:_cartList, totalCartAmount: getCartTotalAmount(cartList: _cartList));
     } else if (event is PosOrderSubmitted){
       try {
         Order order = event.order;
@@ -84,5 +85,13 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
 
   }
 
+  int getCartTotalAmount({List<Item> cartList}){
+    int totalCartAmount = 0;
+    cartList.forEach((element) {
+      totalCartAmount += totalCartAmount + (element.quantity * int.tryParse(element.price));
+      },
+    );
+    return totalCartAmount;
+  }
 
 }

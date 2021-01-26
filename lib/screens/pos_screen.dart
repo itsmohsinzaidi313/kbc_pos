@@ -1,4 +1,5 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -48,14 +49,17 @@ class _PosScreenState extends State<PosScreen> {
       body: BlocListener<PosBloc, MyPosStates>(
         listenWhen: (pre, curr) => pre.states != curr.states,
         listener: (context, states) {
-          if (states.states == PosStates.successful){
-
-            AppTheme.showAlertDialogOK(context,
-            title: 'Message',
-            message: 'Order has been punched successfully',
-            onOK: () => Navigator.pushNamedAndRemoveUntil(context, '/dashboardScreen',
-                    (Route<dynamic> route) => false),);
-
+          if (states.states == PosStates.successful) {
+            AppTheme.showAlertDialogOK(
+              context,
+              title: 'Message',
+              message: 'Order has been punched successfully',
+              onOK: () => Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/dashboardScreen',
+                (Route<dynamic> route) => false,
+              ),
+            );
           } else if (states.error.toString().isNotEmpty) {
             AppTheme.mySnackBar(context: context, msg: states.error);
           } else if (states.states == PosStates.inProgress) {
@@ -108,7 +112,15 @@ class _PosScreenState extends State<PosScreen> {
                             ],
                           ),
                         ),
-                        CartItemList(),
+                        Flexible(
+                          flex: 1,
+                          child: Column(
+                            children: [
+                              CartDetails(),
+                              CartItemList(),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -245,29 +257,29 @@ class _PosScreenState extends State<PosScreen> {
     );
   }
 
-  Future<bool> _onWillPop() async {
-    bool isYes = false;
-    bool type = await AppTheme.showAlertDialogYNFutureReturn(context,
-        title: 'Question?',
-        message: 'Are you sure?',
-        onNo: () => Navigator.of(context).pop(false),
-        onYes: () =>
-            // OrderController(model.orderType).launchAndReplacement(context)
-            true ? isYes = true : isYes = false);
-
-    if (isYes && type) {
-      if (/*model.titleString*/ ''.isNotEmpty) {
-        Navigator.pop(context);
-        return true;
-      } else {
-        Navigator.pop(context);
-        // OrderController(model.orderType).launchAndReplacement(context);
-      }
-      return false;
-    } else {
-      return false;
-    }
-  }
+  // Future<bool> _onWillPop() async {
+  //   bool isYes = false;
+  //   bool type = await AppTheme.showAlertDialogYNFutureReturn(context,
+  //       title: 'Question?',
+  //       message: 'Are you sure?',
+  //       onNo: () => Navigator.of(context).pop(false),
+  //       onYes: () =>
+  //           // OrderController(model.orderType).launchAndReplacement(context)
+  //           true ? isYes = true : isYes = false);
+  //
+  //   if (isYes && type) {
+  //     if (/*model.titleString*/ ''.isNotEmpty) {
+  //       Navigator.pop(context);
+  //       return true;
+  //     } else {
+  //       Navigator.pop(context);
+  //       // OrderController(model.orderType).launchAndReplacement(context);
+  //     }
+  //     return false;
+  //   } else {
+  //     return false;
+  //   }
+  // }
 
   List<Widget> getCategoryWidgets(List<Category> lstCategory) {
     List<Widget> widgets = [];
@@ -278,17 +290,11 @@ class _PosScreenState extends State<PosScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(40),
           ),
-          color: /*_element == category.categoryName ? Colors.white70 : */ Colors
-              .white,
+          color: Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: InkWell(
-              onTap: () {
-/*                setState(() {
-                  categoryName = category.categoryName;
-                  _element = category.categoryName;
-                });*/
-              },
+              onTap: () {},
               child: Row(
                 children: [
                   CircleAvatar(
@@ -418,6 +424,7 @@ class ItemList extends StatelessWidget {
                               Positioned(
                                 bottom: 0,
                                 left: 0,
+                                top: Config.getDeviceHeight(context) * 0.185,
                                 child: Container(
                                   padding: EdgeInsets.all(8),
                                   height:
@@ -434,13 +441,14 @@ class ItemList extends StatelessWidget {
                                     children: [
                                       Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             flex: 2,
                                             child: Text(
                                               states.itemsList[index].name
                                                   .toUpperCase(),
+                                              maxLines: 2,
                                               textAlign: TextAlign.left,
                                               style:
                                                   GoogleFonts.ubuntuCondensed(
@@ -448,12 +456,13 @@ class ItemList extends StatelessWidget {
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.bold,
                                                 letterSpacing: 0,
-                                                wordSpacing: 0.5,
+                                                // wordSpacing: 0.5,
                                               ),
                                             ),
                                           ),
                                           Column(
-                                            // mainAxisAlignment: MainAxisAlignment.end,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
                                             children: [
                                               Text(
                                                 'PKR ${double.parse(states.itemsList[index].price).toInt().toString()}',
@@ -721,5 +730,58 @@ class CartItemList extends StatelessWidget {
         ),
       );
     });
+  }
+}
+
+class CartDetails extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PosBloc, MyPosStates>(
+      buildWhen: (pre, curr) => curr.cartItemsList.length > 0,
+      builder: (context, states) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            RichText(
+              text: TextSpan(
+                text: 'Amount: ',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                  letterSpacing: 0,
+                  fontWeight: FontWeight.bold,
+                ),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: '${states.totalCartAmount.toString()}/=',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      letterSpacing: 1,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Badge(
+              position: BadgePosition.topEnd(top: 0, end: 3),
+              animationDuration: Duration(milliseconds: 300),
+              animationType: BadgeAnimationType.slide,
+              badgeContent: Text(
+                states.cartItemsList.length.toString(),
+                style: TextStyle(color: Colors.white),
+              ),
+              child: IconButton(
+                icon: Icon(
+                  Icons.shopping_cart,
+                  color: Colors.amber,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

@@ -22,7 +22,6 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'custom_widget_classes/custom_appbar.dart';
 
 class OrderInfoScreen extends StatefulWidget {
-
   @override
   _OrderInfoScreenState createState() => _OrderInfoScreenState();
 }
@@ -42,8 +41,8 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   @override
   void initState() {
     super.initState();
-    read =  context.read<OrderInfoBloc>();
-    Future.delayed(Duration.zero, (){
+    read = context.read<OrderInfoBloc>();
+    Future.delayed(Duration.zero, () {
       args = ModalRoute.of(context).settings.arguments;
       context.read<OrderInfoBloc>().add(FetchingLists());
       /*if(args[Order.isEditing] == 0){
@@ -105,10 +104,8 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                           radioButtons: SizedBox(),
                           onBackPressed: () => Navigator.pop(context),
                         ),
-
                         Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             CustomLabelledTextView(
                               labelName: 'Member Name',
@@ -127,16 +124,14 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                             CustomLabelledTextView(
                               labelName: 'Member Status',
                               text: state.selectedMember.length > 0
-                                  ? state
-                                      .selectedMember.last?.memberStatus
+                                  ? state.selectedMember.last?.memberStatus
                                   : '...',
                               // text: state.selectedMember[0].memberStatus ?? '...',
                             ),
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                        /*Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             CustomLabelledTextView(
                               labelName: 'Order No.',
@@ -147,7 +142,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                               text: '...',
                             ),
                           ],
-                        ),
+                        ),*/
                       ],
                     );
                   },
@@ -185,13 +180,12 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                   //   vertical: 20.0,
                   // ),
                   child: BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
-                    builder: (context, state){
+                    builder: (context, state) {
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           seeMultipleMembers(
-                              context: context,
-                              member: state.selectedMember),
+                              context: context, member: state.selectedMember),
                           submitButton(),
                         ],
                       );
@@ -217,19 +211,20 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
             child: RaisedButton.icon(
               onPressed: state.selectedMember.length > 0
                   ? () {
-                      context.read<OrderInfoBloc>().add(
-                          OrderSubmitted(order: Order(
-                            member: state.selectedMember,
-                            orderNo: state.orderNo,
-                            slip: state.slip,
-                            atParty: state.atParty,
-                            userId: Config.userId,
-                            cover: state.cover.value,
-                            waiter: state.waiter.value,
-                            table: state.tableNo.value,
-                            session: state.selectedSession.sessionId.toString(),
-                            venue: state.selectedLocation.locationId.toString()
-                          )));
+                      context.read<OrderInfoBloc>().add(OrderSubmitted(
+                          order: Order(
+                              member: state.selectedMember,
+                              orderNo: state.orderNo,
+                              slip: state.slip,
+                              atParty: state.atParty,
+                              userId: Config.userId,
+                              cover: state.cover.value,
+                              waiter: state.waiter.value,
+                              table: state.tableNo.value,
+                              session:
+                                  state.selectedSession.sessionId.toString(),
+                              venue: state.selectedLocation.locationId
+                                  .toString())));
                     }
                   : null,
               color: AppTheme.listTextColor,
@@ -248,15 +243,20 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                     ),
                     Icon(
                       Icons.arrow_forward,
-                      color: state.selectedMember.length > 0 ? Colors.white : Colors.grey[300],
+                      color: state.selectedMember.length > 0
+                          ? Colors.white
+                          : Colors.grey[300],
                       size: 20,
                     ),
                   ],
                 ),
               ),
               icon: Icon(
-                state.selectedMember.length > 0 ? Icons.check : Icons.clear_rounded,
-                color: state.selectedMember.length > 0 ? Colors.green : Colors.red,
+                state.selectedMember.length > 0
+                    ? Icons.check
+                    : Icons.clear_rounded,
+                color:
+                    state.selectedMember.length > 0 ? Colors.green : Colors.red,
                 size: 20,
               ),
             ),
@@ -278,8 +278,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                 value: 'By Code',
                 groupValue: state.radioGroupValue,
                 onChanged: (value) {
-                  read
-                      .add(ByCodeChanged(byCode: value));
+                  read.add(ByCodeChanged(byCode: value));
                 },
               ),
               Text(
@@ -298,8 +297,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                 value: 'By Name',
                 groupValue: state.radioGroupValue,
                 onChanged: (value) {
-                  read
-                      .add(ByNameChanged(byName: value));
+                  read.add(ByNameChanged(byName: value));
                 },
               ),
               Text(
@@ -326,22 +324,22 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: 'Search a Member..',
-          prefixIcon:  Icon(Icons.search_sharp, color: Colors.grey,),
+          prefixIcon: Icon(
+            Icons.search_sharp,
+            color: Colors.grey,
+          ),
           suffixIcon: IconButton(
             icon: Icon(Icons.clear_rounded),
-            onPressed: (){
+            onPressed: () {
               this._autoCompleteController.text = "";
             },
           ),
         ),
       ),
-      suggestionsCallback: (pattern) async{
+      suggestionsCallback: (pattern) async {
         return await getMembers(pattern);
       },
-      suggestionsBoxDecoration: SuggestionsBoxDecoration(
-
-      ),
-
+      suggestionsBoxDecoration: SuggestionsBoxDecoration(),
       itemBuilder: (BuildContext context, Member suggestion) {
         return Padding(
           padding: const EdgeInsets.all(8.0),
@@ -356,8 +354,8 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
       keepSuggestionsOnLoading: false,
       hideOnLoading: true,
       hideOnEmpty: false,
-      noItemsFoundBuilder: (context){
-        if(_autoCompleteController.text.isNotEmpty){
+      noItemsFoundBuilder: (context) {
+        if (_autoCompleteController.text.isNotEmpty) {
           return ListTile(
             title: Text('No Member Found!'),
           );
@@ -374,9 +372,12 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   }
 
   Future<List<Member>> getMembers(String searchText) async {
-    List<Member> list = await OrderInfoService.searchingMember(text: searchText);
-    if(list != null) return list;
-    else return null;
+    List<Member> list =
+        await OrderInfoService.searchingMember(text: searchText);
+    if (list != null)
+      return list;
+    else
+      return null;
   }
 
   Widget autoCompleteSearchBarRow(
@@ -424,7 +425,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
     );
   }
 
-  Future _showDialog(List<Member> member) async{
+  Future _showDialog(List<Member> member) async {
     return AppTheme.showAlertDialog(
       context,
       title: 'ALERT',
@@ -434,38 +435,105 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
       buttons: [
         FlatButton(
           color: Colors.redAccent,
-          child: Text('Cancel', style: TextStyle(color: Colors.white),),
+          child: Text(
+            'Cancel',
+            style: TextStyle(color: Colors.white),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ],
       content: member.length == 0
           ? Text('List is Empty')
           : SizedBox(
-        height: Config.getDeviceHeight(context) * 0.5,
-        width: Config.getDeviceHeight(context) * 0.5,
-        child: BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
-          builder: (context, state){
-            return ListView.builder(
-              shrinkWrap: true,
-              itemCount: state.selectedMember.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  tileColor: Colors.grey[200],
-                  leading: Icon(Icons.person),
-                  title: Text(state.selectedMember[index].memberName),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red,),
-                    onPressed: () {
-                      read.add(
-                          RemoveMember(member: state.selectedMember[index]));
-                    },
-                  ),
-                );
-              },
-            );
-          },
-        ),
-      ),
+              height: Config.getDeviceHeight(context) * 0.5,
+              width: Config.getDeviceHeight(context) * 0.7,
+              child: BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
+                builder: (context, state) {
+                  return Column(
+                    children: [
+                      ListTile(
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(),
+                            Text(
+                              'Member Name',
+                              style: GoogleFonts.ubuntuCondensed(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 20,
+                                color: Colors.black,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            Text(
+                              'Years',
+                              style: GoogleFonts.ubuntuCondensed(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 20,
+                                color: Colors.black,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            SizedBox(),
+                          ],
+                        ),
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: state.selectedMember.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return ListTile(
+                            // tileColor: Colors.grey[200],
+                            leading: Icon(Icons.person),
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    state.selectedMember[index].memberName,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    style: GoogleFonts.ubuntuMono(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 17,
+                                      color: Colors.grey[600],
+                                      letterSpacing: 1.0,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  (Config.getCurrentYear() -
+                                          int.tryParse(state
+                                              .selectedMember[index]
+                                              .memberElectDate))
+                                      .toString(),
+                                  style: GoogleFonts.ubuntuMono(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                    color: Colors.grey[800],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.redAccent,
+                              ),
+                              onPressed: () {
+                                read.add(RemoveMember(
+                                    member: state.selectedMember[index]),);
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
     );
   }
 }
@@ -720,9 +788,7 @@ class CoverInput extends StatelessWidget {
               ),
               keyboardType: TextInputType.number,
               onChanged: (value) {
-                context
-                    .read<OrderInfoBloc>()
-                    .add(CoverChanged(cover: value));
+                context.read<OrderInfoBloc>().add(CoverChanged(cover: value));
               },
               textInputAction: TextInputAction.done,
             ),
@@ -732,7 +798,6 @@ class CoverInput extends StatelessWidget {
     );
   }
 }
-
 
 class AtPartyCheckBox extends StatelessWidget {
   @override

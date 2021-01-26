@@ -17,7 +17,7 @@ class Config {
   static final String searchMembersAPI = "$commonAPI/searchmember$key&phrase=";
   static final String searchItemAPI = "$commonAPI/searchitems$key&phrase=";
   static final String sendOrderAPI = "$commonAPI/neworder$key";
-  static final String getOrderAPI = "$commonAPI/neworder$key";
+  static final String getOrderAPI = "$commonAPI/getorders$key";
 
   setLoginUserAPI(String username, String password){
     loginUserAPI = "$commonAPI/getuser$key&username=$username&password=$password";
@@ -77,6 +77,13 @@ class Config {
     DateFormat formatDateTime = DateFormat("HH:mm:ss");
     String currentDateTime = formatDateTime.format(dateTime);
     return currentDateTime;
+  }
+
+  static int getCurrentYear() {
+    DateTime dateTime = DateTime.now();
+    DateFormat formatDateTime = DateFormat("yyyy");
+    int currentYear = int.parse(formatDateTime.format(dateTime));
+    return currentYear;
   }
 
   static String getCurrentShiftDate(String date) {

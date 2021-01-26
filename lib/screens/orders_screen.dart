@@ -41,14 +41,19 @@ class _OrderScreenState extends State<OrderScreen> {
               BlocBuilder<OrderBloc, MyOrderStates>(
                 builder: (context, state) {
                   if (state is MyOrderStateList) {
-                    return ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      physics: ClampingScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: state.order.length,
-                      itemBuilder: (context, index) {
-                        return orderListItem(order: state.order[index]);
-                      },
+                    return Expanded(
+                      flex: 1,
+                      child: SingleChildScrollView(
+                        child: ListView.builder(
+                          scrollDirection: Axis.vertical,
+                          physics: ClampingScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: state.order.length,
+                          itemBuilder: (context, index) {
+                            return orderListItem(order: state.order[index]);
+                          },
+                        ),
+                      ),
                     );
                   } else if (state is MyOrderStatesError) {}
                   return CustomCircularProgressIndication();
@@ -64,7 +69,7 @@ class _OrderScreenState extends State<OrderScreen> {
       title: order.member.length > 0
           ? Text('Multiple Members')
           : Text(order.member.first.memberName),
-      leading: Text(order.orderNo),
+      leading: Text(order.orderNo.toString()),
       trailing: Icon(Icons.arrow_drop_down),
       children: [
         Column(

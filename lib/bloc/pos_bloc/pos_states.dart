@@ -12,6 +12,7 @@ class MyPosStates{
   final PosStates states;
   final Category selectedCategory;
   final error;
+  final totalCartAmount;
 
   MyPosStates({
     this.categoriesList = const [],
@@ -19,7 +20,9 @@ class MyPosStates{
     this.cartItemsList = const [],
     this.error = "",
     this.selectedCategory = const Category(),
-    this.states = PosStates.init});
+    this.states = PosStates.init,
+    this.totalCartAmount = 0,
+  });
 
   MyPosStates copyWith({
     List<Category> categoriesList,
@@ -27,7 +30,8 @@ class MyPosStates{
     List<Item> cartItemsList,
     final error,
     Category selectedCategory,
-    PosStates states
+    PosStates states,
+    int totalCartAmount
   }){
     return MyPosStates(
         categoriesList: categoriesList ?? this.categoriesList,
@@ -35,7 +39,8 @@ class MyPosStates{
         cartItemsList: cartItemsList ?? this.cartItemsList,
         states: states ?? this.states,
       error: error ?? this.error,
-      selectedCategory: selectedCategory ?? this.selectedCategory
+      selectedCategory: selectedCategory ?? this.selectedCategory,
+      totalCartAmount: totalCartAmount ?? this.totalCartAmount,
     );
   }
 

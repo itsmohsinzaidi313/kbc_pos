@@ -1,9 +1,9 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:kbc_pos/models/objects/item.dart';
 import 'package:kbc_pos/models/objects/member.dart';
 
 class Order {
-
   static final String isEditing = 'isEditing';
   static final String deviceKEY = 'deviceKey';
 
@@ -23,44 +23,63 @@ class Order {
 
   final List<Item> item;
   final List<Member> member;
-  final String orderNo, cover, slip, venue, session, waiter, orderKey,
-      table, userId, deviceKey;
+  final String orderNo,
+      cover,
+      slip,
+      venue,
+      session,
+      waiter,
+      orderKey,
+      table,
+      userId,
+      deviceKey;
   final bool atParty;
 
-  const Order({ this.atParty ,this.item, this.member, this.orderNo, this.cover, this.slip,
-    this.venue, this.session, this.waiter, this.table, this.userId, this.orderKey ,this.deviceKey });
+  const Order(
+      {this.atParty,
+      this.item,
+      this.member,
+      this.orderNo,
+      this.cover,
+      this.slip,
+      this.venue,
+      this.session,
+      this.waiter,
+      this.table,
+      this.userId,
+      this.orderKey,
+      this.deviceKey});
 
   Map<String, dynamic> toJson() => {
-    orderItemsList : item.map((e) => e.toJson()).toList(),
-    orderMembersList : member.map((e) => e.toJson()).toList(),
-    orderOrderNo : orderNo,//
-    orderCover : cover,
-    orderSlip : slip,//
-    orderVenue : venue,
-    orderSession : session,
-    orderWaiter : waiter,
-    orderTable :  table,
-    orderUserId : userId,
-    orderDeviceKey : deviceKey,
-    orderAtParty : atParty,
-    orderOrderKey : orderKey
-  };
+        orderItemsList: item.map((e) => e.toJson()).toList(),
+        orderMembersList: member.map((e) => e.toJson()).toList(),
+        orderOrderNo: orderNo, //
+        orderCover: cover,
+        orderSlip: slip, //
+        orderVenue: venue,
+        orderSession: session,
+        orderWaiter: waiter,
+        orderTable: table,
+        orderUserId: userId,
+        orderDeviceKey: deviceKey,
+        orderAtParty: atParty,
+        orderOrderKey: orderKey
+      };
 
   factory Order.fromJson(Map<String, dynamic> map) => Order(
-    member: memberListFromJson(json.decode(jsonEncode(map[orderItemsList]))),
-    item: itemListFromJson(json.decode(jsonEncode(map[orderMembersList]))),
-    orderNo: map[orderOrderNo],
-    cover: map[orderCover],
-    slip: map[orderSlip],
-    venue: map[orderVenue],
-    session: map[orderSession],
-    waiter: map[orderWaiter],
-    table: map[orderTable],
-    userId: map[orderUserId],
-    deviceKey: map[orderDeviceKey],
-    atParty: map[orderAtParty],
-    orderKey: map[orderOrderKey]
-  );
+      member: getMemberListFromDynamicList(map[orderMembersList]),
+      item: getItemListFromDynamicList(map[orderItemsList]),
+      orderNo: map[orderOrderNo],
+      cover: map[orderCover].toString(),
+      slip: map[orderSlip].toString(),
+      venue: map[orderVenue].toString(),
+      session: map[orderSession].toString(),
+      waiter: map[orderWaiter].toString(),
+      table: map[orderTable].toString(),
+      userId: map[orderUserId].toString(),
+      deviceKey: map[orderDeviceKey],
+      atParty: map[orderAtParty],
+      orderKey: map[orderOrderKey]);
 
   @override
   String toString() {
@@ -69,4 +88,21 @@ class Order {
   }
 }
 
-List<Order> orderListFromJson(String str) => List<Order>.from(json.decode(str)['Data'].map((x) => Order.fromJson(x)));
+List<Order> orderListFromJson(String str) =>
+    List<Order>.from(json.decode(str)['Data'].map((x) => Order.fromJson(x)));
+
+List<Member> getMemberListFromDynamicList(List<dynamic> list) {
+  List<Member> membersList = [];
+  list.forEach((element) {
+    membersList.add(Member.fromJson(element));
+  });
+  return membersList;
+}
+
+List<Item> getItemListFromDynamicList(List<dynamic> list) {
+  List<Item> itemList = [];
+  list.forEach((element) {
+    itemList.add(Item.fromJson(element));
+  });
+  return itemList;
+}
