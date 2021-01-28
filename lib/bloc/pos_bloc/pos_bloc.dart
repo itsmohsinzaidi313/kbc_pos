@@ -18,11 +18,24 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
   @override
   Stream<MyPosStates> mapEventToState(PosEvent event) async*{
     if(event is FetchAllLists){
-      _cartList.clear();
+
+      if(Config.isEditing == 1){
+        // _cartList.clear();
+        _cartList = Config.selectedOrder.item;
+
+      } else if(Config.isEditing == 0){
+        _cartList.clear();
+        yield state.copyWith(cartItemsList: _cartList, totalCartAmount: 0.0);
+      }
       yield state.copyWith(states: PosStates.inProgress);
       try{
         List<Category> list = await posRepo.getCategories();
-        yield state.copyWith(categoriesList: list, states: PosStates.categoryListLoaded, selectedCategory: list.first);
+        if (Config.isEditing == 0) {
+          yield state.copyWith(categoriesList: list, states: PosStates.categoryListLoaded, selectedCategory: list.first);
+        } else if (Config.isEditing == 1) {
+          yield state.copyWith(categoriesList: list, states: PosStates.categoryListLoaded,
+              selectedCategory: list.first, cartItemsList: _cartList, totalCartAmount: getCartTotalAmount(cartList: _cartList ?? []));
+        }
         List<Item> items = await posRepo.getItemsById(id: list.first.id);
         yield state.copyWith(itemsList: items, states: PosStates.init);
       } catch(e){
@@ -69,13 +82,15 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
     } else if (event is PosOrderSubmitted){
       try {
         Order order = event.order;
-        Order order2 = Order(atParty: order.atParty ,item: state.cartItemsList, member: order.member, orderNo: order.orderNo,
-                  cover: order.cover, session: order.session, slip: order.slip, table: order.table, venue: order.venue,
+        Order order2 = Order(editing: Config.isEditing, atParty: order.atParty ,item: state.cartItemsList, member: order.member, orderNo: order.orderNo,
+                  cover: order.cover, session: order.session, slip: order.slip, table: order.table, venue: order.venue, orderKey: order.orderKey ?? '',
             waiter: order.waiter, userId: order.userId, deviceKey: Config.deviceKey ?? '');
-        yield state.copyWith(states: PosStates.inProgress, /* categoriesList: state.categoriesList, cartItemsList: state.cartItemsList, itemsList: state.itemsList*/);
+        yield state.copyWith(states: PosStates.inProgress);
         ResponseDetail responseDetail = await posRepo.sendOrder(order2.toJson());
         if(responseDetail.status) {
           yield state.copyWith(states: PosStates.successful);
+        } else{
+          yield state.copyWith(states: PosStates.failed, error: responseDetail.message);
         }
       } catch (e) {
         yield state.copyWith(error: e.toString());
@@ -85,10 +100,10 @@ class PosBloc extends Bloc<PosEvent, MyPosStates>{
 
   }
 
-  int getCartTotalAmount({List<Item> cartList}){
-    int totalCartAmount = 0;
+  double getCartTotalAmount({List<Item> cartList}){
+    double totalCartAmount = 0.0;
     cartList.forEach((element) {
-      totalCartAmount += totalCartAmount + (element.quantity * int.tryParse(element.price));
+      totalCartAmount +=  (element.quantity * double.tryParse(element.price));
       },
     );
     return totalCartAmount;

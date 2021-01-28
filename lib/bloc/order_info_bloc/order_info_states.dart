@@ -8,6 +8,8 @@ import 'package:kbc_pos/models/objects/member.dart';
 import 'package:kbc_pos/models/objects/order.dart';
 import 'package:kbc_pos/models/objects/session.dart';
 
+enum OrderInfoStates { init, progressing, successful, failure}
+
 class MyOrderInfoStates{
   final List<Member> membersList;
   final List<DropdownMenuItem<Location>> locationList;
@@ -17,7 +19,7 @@ class MyOrderInfoStates{
   final bool atParty;
   final Location selectedLocation;
   final Session selectedSession;
-  final FormzStatus status;
+  final OrderInfoStates status;
   final Waiter waiter;
   final TableNo tableNo;
   final List<Member> selectedMember;
@@ -36,7 +38,7 @@ class MyOrderInfoStates{
         this.atParty = false,
         this.selectedLocation = const Location(),
         this.selectedSession = const Session(),
-        this.status = FormzStatus.pure,
+        this.status = OrderInfoStates.init,
         this.waiter = const Waiter.pure(),
         this.tableNo = const TableNo.pure(),
         this.cover = const Covers.pure(),
@@ -66,7 +68,7 @@ class MyOrderInfoStates{
         List<Member> selectedMember,
         String byCode,
         String byName,
-        FormzStatus status,
+        OrderInfoStates status,
         String orderNo,
         String slip,
         Covers cover,

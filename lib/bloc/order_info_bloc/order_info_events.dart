@@ -96,7 +96,7 @@ class OrderSubmitted extends OrderInfoEvent{
 }
 
 class OrderEditing extends OrderInfoEvent{
-  final String deviceKey;
-  OrderEditing({this.deviceKey});
+  final Order order;
+  OrderEditing({this.order});
 }
 

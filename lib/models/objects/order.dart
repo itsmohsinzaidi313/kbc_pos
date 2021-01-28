@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:kbc_pos/models/objects/item.dart';
 import 'package:kbc_pos/models/objects/member.dart';
+import 'package:kbc_pos/shared/config.dart';
 
 class Order {
   static final String isEditing = 'isEditing';
-  static final String deviceKEY = 'deviceKey';
+  static final String order = 'order';
 
   static final String orderItemsList = 'orderItemsList';
   static final String orderMembersList = 'orderMembersList';
@@ -33,6 +33,7 @@ class Order {
       table,
       userId,
       deviceKey;
+  final int editing;
   final bool atParty;
 
   const Order(
@@ -48,6 +49,7 @@ class Order {
       this.table,
       this.userId,
       this.orderKey,
+        this.editing,
       this.deviceKey});
 
   Map<String, dynamic> toJson() => {
@@ -63,7 +65,8 @@ class Order {
         orderUserId: userId,
         orderDeviceKey: deviceKey,
         orderAtParty: atParty,
-        orderOrderKey: orderKey
+        orderOrderKey: orderKey,
+        isEditing : editing
       };
 
   factory Order.fromJson(Map<String, dynamic> map) => Order(

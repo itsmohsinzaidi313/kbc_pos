@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:formz/formz.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_events.dart';
 import 'package:kbc_pos/bloc/order_info_bloc/order_info_states.dart';
 import 'package:kbc_pos/data_provider/order_info_repo/order_info_service.dart';
@@ -9,6 +8,7 @@ import 'package:kbc_pos/models/model_order_info/table_no.dart';
 import 'package:kbc_pos/models/model_order_info/waiter.dart';
 import 'package:kbc_pos/models/objects/location.dart';
 import 'package:kbc_pos/models/objects/member.dart';
+import 'package:kbc_pos/models/objects/order.dart';
 import 'package:kbc_pos/models/objects/session.dart';
 
 class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
@@ -28,7 +28,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
         yield FetchingListInProgress();
         _selectedMembersList.clear();
         yield state.copyWith( atParty: false, cover: Covers.pure(''), isEditing: 0, selectedMember: [], selectedSession: Session(),
-          selectedLocation: Location(), sessionList: [], membersList: [], venueList: [], );
+          selectedLocation: Location(), membersList: [] );
         List<Location> location = await orderInfoRepo.getLocation();
         List<Session> session = await orderInfoRepo.getSession();
         locationMapListToDropdownMenuItemList(list: location);
@@ -41,7 +41,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
             selectedSession: session.first);
       } catch (e) {
         yield state.copyWith(
-            status: FormzStatus.submissionFailure, error: e.toString());
+            status: OrderInfoStates.failure, error: e.toString());
       }
     } else if (event is AtPartyChanged) {
       yield state.copyWith(atParty: event.atParty);
@@ -54,29 +54,29 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
     } else if (event is WaiterUnfocused) {
       final waiter = Waiter.dirty(state.waiter.value);
       yield state.copyWith(
-          waiter: waiter, status: Formz.validate([waiter, state.tableNo, state.cover]));
+          waiter: waiter, /*status: Formz.validate([waiter, state.tableNo, state.cover])*/);
     } else if (event is CoverUnfocused) {
       final cover = Covers.dirty(state.cover.value);
       yield state.copyWith(
-          cover: cover, status: Formz.validate([state.waiter, state.tableNo, cover]));
+          cover: cover, /*status: Formz.validate([state.waiter, state.tableNo, cover])*/);
     } else if (event is TableNoUnfocused) {
       final tableNo = TableNo.dirty(state.tableNo.value);
       yield state.copyWith(
-          tableNo: tableNo, status: Formz.validate([state.waiter, tableNo, state.cover]));
+          tableNo: tableNo, /*status: Formz.validate([state.waiter, tableNo, state.cover])*/);
     } else if (event is WaiterChanged) {
       final waiter = Waiter.dirty(event.waiter);
       yield state.copyWith(
           waiter: waiter.valid ? waiter : Waiter.pure(event.waiter),
-          status: Formz.validate([waiter, state.tableNo, state.cover]));
+          /*status: Formz.validate([waiter, state.tableNo, state.cover])*/);
     } else if (event is TableNoChanged) {
       final tableNo = TableNo.dirty(event.tableNo);
       yield state.copyWith(
           tableNo: tableNo.valid ? tableNo : TableNo.pure(event.tableNo),
-          status: Formz.validate([state.waiter, tableNo, state.cover]));
+          /*status: Formz.validate([state.waiter, tableNo, state.cover])*/);
     } else if (event is SelectedMember) {
       if(!_selectedMembersList.contains(event.member)){
         _selectedMembersList.add(event.member);
-        yield state.copyWith(selectedMember: _selectedMembersList);
+        yield state.copyWith(selectedMember: _selectedMembersList, status: OrderInfoStates.init);
       }
      else{
         yield state.copyWith(error: 'Member Already Exist');
@@ -84,7 +84,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
     } else if(event is CoverChanged){
       final cover = Covers.dirty(event.cover);
       yield state.copyWith(cover: cover.valid ? cover : Covers.pure(event.cover),
-      status: Formz.validate([cover, state.waiter, state.tableNo]));
+      /*status: Formz.validate([cover, state.waiter, state.tableNo])*/);
     }
     else if(event is ByCodeChanged){
       yield state.copyWith(byCode: event.byCode, radioGroupValue: event.byCode);
@@ -100,7 +100,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
       }
     } else if(event is RemoveMember){
       _selectedMembersList.remove(event.member);
-      yield state.copyWith(selectedMember: _selectedMembersList);
+      yield state.copyWith(selectedMember: _selectedMembersList, status: OrderInfoStates.init);
     } else if (event is OrderSubmitted) {
       final waiter = Waiter.dirty(state.waiter.value);
       final tableNo = TableNo.dirty(state.tableNo.value);
@@ -111,15 +111,40 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, MyOrderInfoStates> {
         cover: cover,
         atParty: state.atParty,
         order: event.order,
-        status: Formz.validate([waiter, tableNo],),
+       status: OrderInfoStates.successful
+       /* status: Formz.validate([waiter, tableNo],),*/
       );
 
-      if (state.status.isValidated) {
+/*      if (state.status.isValidated) {
         yield state.copyWith(status: FormzStatus.submissionSuccess);
-      }
+      }*/
     } else if (event is OrderEditing){
       try{
-
+        List<Location> location = await orderInfoRepo.getLocation();
+        List<Session> session = await orderInfoRepo.getSession();
+        locationMapListToDropdownMenuItemList(list: location);
+        sessionMapListToDropdownMenuItemList(list: session);
+        yield state.copyWith(
+            venueList: _venueList,
+            sessionList: _sessionList,
+        status: OrderInfoStates.init);
+        Order order = event.order;
+        Session _session;
+        Location _venue;
+        _selectedMembersList = order.member;
+        state.sessionList.forEach((element) {
+          if(element.value.sessionId == event.order.session){
+            _session = element.value;
+          }
+        });
+        state.locationList.forEach((element) {
+          if(element.value.locationId == event.order.venue){
+            _venue = element.value;
+          }
+        });
+        yield state.copyWith(selectedMember: _selectedMembersList, selectedSession: _session,
+          selectedLocation: _venue, waiter: Waiter.pure(order.waiter),
+            tableNo: TableNo.pure(order.table), cover: Covers.pure(order.cover), atParty: order.atParty ?? false, order: order);
       }
       catch(e){
         yield state.copyWith(error: e.toString());

@@ -53,7 +53,7 @@ class _PosScreenState extends State<PosScreen> {
             AppTheme.showAlertDialogOK(
               context,
               title: 'Message',
-              message: 'Order has been punched successfully',
+              message: Config.isEditing == 0 ? 'Order has been punched successfully' : 'Order has been updated successfully',
               onOK: () => Navigator.pushNamedAndRemoveUntil(
                 context,
                 '/dashboardScreen',
@@ -62,9 +62,9 @@ class _PosScreenState extends State<PosScreen> {
             );
           } else if (states.error.toString().isNotEmpty) {
             AppTheme.mySnackBar(context: context, msg: states.error);
-          } else if (states.states == PosStates.inProgress) {
+          } /*else if (states.states == PosStates.inProgress) {
             AppTheme.mySnackBar(context: context, msg: 'Progressing...');
-          }
+          }*/
         },
         child: SingleChildScrollView(
           child: Container(

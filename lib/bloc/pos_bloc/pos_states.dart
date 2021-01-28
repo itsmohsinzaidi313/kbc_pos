@@ -12,7 +12,7 @@ class MyPosStates{
   final PosStates states;
   final Category selectedCategory;
   final error;
-  final totalCartAmount;
+  final double totalCartAmount;
 
   MyPosStates({
     this.categoriesList = const [],
@@ -31,7 +31,7 @@ class MyPosStates{
     final error,
     Category selectedCategory,
     PosStates states,
-    int totalCartAmount
+    double totalCartAmount
   }){
     return MyPosStates(
         categoriesList: categoriesList ?? this.categoriesList,

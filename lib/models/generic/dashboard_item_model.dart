@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kbc_pos/models/objects/order.dart';
 import 'package:kbc_pos/screens/order_info_screen.dart';
+import 'package:kbc_pos/shared/app_theme.dart';
+import 'package:kbc_pos/shared/config.dart';
 
 class DashboardItemModel {
 
@@ -44,12 +46,23 @@ class DashboardItemModel {
   static navigationFromDashboard(int index, BuildContext context){
     switch(index){
       case 0:
-        Navigator.pushNamed(context, '/orderInfoScreen', arguments: {
-          Order.isEditing : 0,
-        });
+        // Navigator.pushNamed(context, '/orderInfoScreen', arguments: {
+        //   Order.isEditing : 0,
+        // }
+        Navigator.pushNamed(context, '/orderInfoScreen');
+        Config.isEditing = 0;
         break;
       case 1:
         Navigator.pushNamed(context, '/ordersScreen');
+        break;
+      case 2:
+        AppTheme.showAlertDialogYN(context,
+            title: 'Log Out',
+            message: 'Are You Sure?',
+            onNo: () => Navigator.pop(context),
+            onYes: () {
+              Navigator.pushNamedAndRemoveUntil(context, '/loginScreen', (route) => false);
+            });
         break;
     }
   }

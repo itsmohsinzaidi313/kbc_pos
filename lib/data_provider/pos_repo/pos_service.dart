@@ -62,12 +62,14 @@ class PosService extends PosRepo{
     // Map responseMap;
     // responseMap = jsonDecode(response.body);
     // responseMap.forEach((key, value) {print('$key : $value');});
+    Map<String, dynamic> responseM;
     if(response.statusCode == 200){
       print(response.body);
-      return ResponseDetail(status: true, message: response.reasonPhrase);
+      responseM = json.decode(response.body);
+      return ResponseDetail(status: responseM[Config.STATUS], message: responseM[Config.MESSAGE]);
+    } else{
+      return ResponseDetail(status: responseM[Config.STATUS], message: responseM[Config.MESSAGE]);
     }
-    return ResponseDetail(status: false, message: response.reasonPhrase);
-
   }
 
   static Future<List<Item>> searchingItem({String text}) async{

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kbc_pos/models/objects/order.dart';
 import 'package:logger/logger.dart';
 
 class Config {
@@ -18,6 +19,12 @@ class Config {
   static final String searchItemAPI = "$commonAPI/searchitems$key&phrase=";
   static final String sendOrderAPI = "$commonAPI/neworder$key";
   static final String getOrderAPI = "$commonAPI/getorders$key";
+  static final String paymentOrderAPI = "$commonAPI/payorder$key";
+  static final String deleteOrderAPI = "$commonAPI/deleteorder$key";
+
+  static const String STATUS = "Status";
+  static const String MESSAGE = "Message";
+  static const String DATA = "Data";
 
   setLoginUserAPI(String username, String password){
     loginUserAPI = "$commonAPI/getuser$key&username=$username&password=$password";
@@ -29,17 +36,25 @@ class Config {
   //region ___USER ID___
   static String _userId;
   static String get userId => _userId;
-  static set userId(String value) {
-    _userId = value;
-  }
+  static set userId(String value) => _userId = value;
   //endregion
 
   //region ___DEVICE KEY___
   static String _deviceKey;
   static String get deviceKey => _deviceKey;
-  static set deviceKey(String value) {
-    _deviceKey = value;
-  }
+  static set deviceKey(String value) => _deviceKey = value;
+  //endregion
+
+  //region ___isEditing FLAG___
+  static int _isEditing;
+  static int get isEditing => _isEditing;
+  static set isEditing(int value) => _isEditing = value;
+  //endregion
+
+  //region ___SELECTED ORDER___
+  static Order _selectedOrder;
+  static Order get selectedOrder => _selectedOrder;
+  static set selectedOrder(Order value) => _selectedOrder = value;
   //endregion
 
   static double getDeviceWidth(BuildContext context) =>

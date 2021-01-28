@@ -15,3 +15,9 @@ class MyOrderStatesError extends MyOrderStates{
   final String error;
   MyOrderStatesError({this.error});
 }
+
+class OrderPaymentSuccessfully extends MyOrderStates{
+}
+
+class OrderDeletedSuccessfully extends MyOrderStates{
+}

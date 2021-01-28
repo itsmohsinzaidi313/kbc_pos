@@ -37,19 +37,22 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   bool isProgressing = false;
   dynamic read;
   Map<String, dynamic> args;
+  Order order;
 
   @override
   void initState() {
     super.initState();
     read = context.read<OrderInfoBloc>();
+/*
     Future.delayed(Duration.zero, () {
       args = ModalRoute.of(context).settings.arguments;
       context.read<OrderInfoBloc>().add(FetchingLists());
-      /*if(args[Order.isEditing] == 0){
+      if(args[Order.isEditing] == 0){
         context.read<OrderInfoBloc>().add(FetchingLists());
       } else if (args[Order.isEditing] == 1){
-        context.read<OrderInfoBloc>().add(OrderEditing(deviceKey: args[Order.deviceKEY]));
-      }*/
+        order = Order.fromJson(args[Order.order]);
+        context.read<OrderInfoBloc>().add(OrderEditing(order: order));
+      }
       _waiterFocusNode.addListener(() {
         if (!_waiterFocusNode.hasFocus) {
           context.read<OrderInfoBloc>().add(WaiterUnfocused());
@@ -68,6 +71,29 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
         }
       });
     });
+*/
+    if(Config.isEditing == 0){
+      context.read<OrderInfoBloc>().add(FetchingLists());
+    } else if (Config.isEditing == 1) {
+      context.read<OrderInfoBloc>().add(OrderEditing(order: Config.selectedOrder));
+    }
+    _waiterFocusNode.addListener(() {
+      if (!_waiterFocusNode.hasFocus) {
+        context.read<OrderInfoBloc>().add(WaiterUnfocused());
+        FocusScope.of(context).requestFocus(_tableNoFocusNode);
+      }
+    });
+    _tableNoFocusNode.addListener(() {
+      if (!_tableNoFocusNode.hasFocus) {
+        context.read<OrderInfoBloc>().add(TableNoUnfocused());
+        FocusScope.of(context).requestFocus(_coverFocusNode);
+      }
+    });
+    _coverFocusNode.addListener(() {
+      if (!_coverFocusNode.hasFocus) {
+        context.read<OrderInfoBloc>().add(CoverUnfocused());
+      }
+    });
   }
 
   @override
@@ -75,16 +101,16 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
     return Scaffold(
       key: _key,
       body: BlocListener<OrderInfoBloc, MyOrderInfoStates>(
-        listenWhen: (previous, current) => previous != current,
+        listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) {
           if (state is FetchingListInProgress) {
             AppTheme.mySnackBar(context: context, msg: 'Loading..');
-          } else if (state.status.isSubmissionFailure) {
+          } else if (state.status == OrderInfoStates.failure) {
             AppTheme.mySnackBar(context: context, msg: state.error);
-          } else if (state.status.isSubmissionInProgress) {
+          } else if (state.status== OrderInfoStates.progressing) {
             // CircularProgressIndicator();
             AppTheme.mySnackBar(context: context, msg: 'Please Wait..');
-          } else if (state.status.isSubmissionSuccess) {
+          } else if (state.status == OrderInfoStates.successful) {
             Navigator.pushNamed(context, '/posScreen');
           }
         },
@@ -221,6 +247,8 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                               cover: state.cover.value,
                               waiter: state.waiter.value,
                               table: state.tableNo.value,
+                              orderKey: state.order.orderKey ?? '',
+                              // editing: args[Order.isEditing],
                               session:
                                   state.selectedSession.sessionId.toString(),
                               venue: state.selectedLocation.locationId
@@ -428,7 +456,7 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
   Future _showDialog(List<Member> member) async {
     return AppTheme.showAlertDialog(
       context,
-      title: 'ALERT',
+      title: 'Members List',
       color: Colors.black,
       fontWeight: FontWeight.w500,
       fontSize: 20,
@@ -478,56 +506,59 @@ class _OrderInfoScreenState extends State<OrderInfoScreen> {
                           ],
                         ),
                       ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: state.selectedMember.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListTile(
-                            // tileColor: Colors.grey[200],
-                            leading: Icon(Icons.person),
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    state.selectedMember[index].memberName,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
-                                    style: GoogleFonts.ubuntuMono(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 17,
-                                      color: Colors.grey[600],
-                                      letterSpacing: 1.0,
+                      Flexible(
+                        flex: 1,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: state.selectedMember.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return ListTile(
+                              // tileColor: Colors.grey[200],
+                              leading: Icon(Icons.person),
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      state.selectedMember[index].memberName,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                      style: GoogleFonts.ubuntuMono(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 17,
+                                        color: Colors.grey[600],
+                                        letterSpacing: 1.0,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Text(
-                                  (Config.getCurrentYear() -
-                                          int.tryParse(state
-                                              .selectedMember[index]
-                                              .memberElectDate))
-                                      .toString(),
-                                  style: GoogleFonts.ubuntuMono(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 17,
-                                    color: Colors.grey[800],
+                                  Text(
+                                    (Config.getCurrentYear() -
+                                            int.tryParse(state
+                                                .selectedMember[index]
+                                                .memberElectDate))
+                                        .toString(),
+                                    style: GoogleFonts.ubuntuMono(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 17,
+                                      color: Colors.grey[800],
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            trailing: IconButton(
-                              icon: Icon(
-                                Icons.delete,
-                                color: Colors.redAccent,
+                                ],
                               ),
-                              onPressed: () {
-                                read.add(RemoveMember(
-                                    member: state.selectedMember[index]),);
-                              },
-                            ),
-                          );
-                        },
+                              trailing: IconButton(
+                                icon: Icon(
+                                  Icons.delete,
+                                  color: Colors.redAccent,
+                                ),
+                                onPressed: () {
+                                  read.add(RemoveMember(
+                                      member: state.selectedMember[index]),);
+                                },
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   );
@@ -678,14 +709,18 @@ class SessionDropdown extends StatelessWidget {
 }
 
 class WaiterInput extends StatelessWidget {
-  const WaiterInput({Key key, this.focusNode}) : super(key: key);
+  WaiterInput({Key key, this.focusNode}) : super(key: key);
 
   final FocusNode focusNode;
+  final TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
       builder: (context, state) {
+        if(state.waiter.value.isNotEmpty){
+          _controller.text = state.waiter.value;
+        }
         return Flexible(
           flex: 1,
           child: Container(
@@ -694,6 +729,7 @@ class WaiterInput extends StatelessWidget {
             child: TextFormField(
               // initialValue: state.password.value,
               focusNode: focusNode,
+              controller: _controller,
               decoration: InputDecoration(
                 icon: const Icon(Icons.person),
                 labelText: 'Waiter',
@@ -709,6 +745,7 @@ class WaiterInput extends StatelessWidget {
                 context.read<OrderInfoBloc>().add(WaiterChanged(waiter: value));
               },
               textInputAction: TextInputAction.next,
+
             ),
           ),
         );
@@ -718,14 +755,18 @@ class WaiterInput extends StatelessWidget {
 }
 
 class TableInput extends StatelessWidget {
-  const TableInput({Key key, this.focusNode}) : super(key: key);
+  TableInput({Key key, this.focusNode}) : super(key: key);
 
   final FocusNode focusNode;
+  final TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
       builder: (context, state) {
+        if(state.tableNo.value.isNotEmpty){
+          _controller.text = state.tableNo.value;
+        }
         return Flexible(
           flex: 1,
           child: Container(
@@ -733,6 +774,7 @@ class TableInput extends StatelessWidget {
             margin: EdgeInsets.all(5.0),
             child: TextFormField(
               // initialValue: state.password.value,
+              controller: _controller,
               focusNode: focusNode,
               decoration: InputDecoration(
                 icon: const Icon(Icons.wine_bar),
@@ -760,14 +802,18 @@ class TableInput extends StatelessWidget {
 }
 
 class CoverInput extends StatelessWidget {
-  const CoverInput({Key key, this.focusNode}) : super(key: key);
+  CoverInput({Key key, this.focusNode}) : super(key: key);
 
   final FocusNode focusNode;
+  final TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<OrderInfoBloc, MyOrderInfoStates>(
       builder: (context, state) {
+        if(state.cover.value.isNotEmpty){
+          _controller.text = state.cover.value;
+        }
         return Flexible(
           flex: 1,
           child: Container(
@@ -776,6 +822,7 @@ class CoverInput extends StatelessWidget {
             child: TextFormField(
               // initialValue: state.password.value,
               focusNode: focusNode,
+              controller: _controller,
               decoration: InputDecoration(
                 icon: const Icon(Icons.dialpad),
                 labelText: 'Cover',
